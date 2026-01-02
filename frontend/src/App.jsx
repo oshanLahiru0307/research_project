@@ -29,6 +29,7 @@ function AppRoutes() {
               <Routes>
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/diagnosis/*" element={<Diagnosis />} />
+                <Route path="/diagnose/*" element={<Diagnosis />} />
                 <Route path="/patient" element={<Patient />} />
                 <Route path="/" element={<Navigate to="/dashboard" replace />} />
               </Routes>
