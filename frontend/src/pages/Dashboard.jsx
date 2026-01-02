@@ -51,10 +51,10 @@ function Dashboard() {
   ]
 
   const recentPatients = [
-    { id: 1, name: 'John Doe', condition: 'Diabetic Retinopathy', date: '2024-01-15', status: 'Active' },
-    { id: 2, name: 'Jane Smith', condition: 'Glaucoma', date: '2024-01-14', status: 'Monitoring' },
-    { id: 3, name: 'Robert Johnson', condition: 'Cataract', date: '2024-01-13', status: 'Active' },
-    { id: 4, name: 'Emily Davis', condition: 'AMD', date: '2024-01-12', status: 'Critical' },
+    { id: 1, name: 'John Doe', condition: 'Digestive', date: '2024-01-15', status: 'Active' },
+    { id: 2, name: 'Jane Smith', condition: 'Spinal', date: '2024-01-14', status: 'Monitoring' },
+    { id: 3, name: 'Robert Johnson', condition: 'Liver', date: '2024-01-13', status: 'Active' },
+    { id: 4, name: 'Emily Davis', condition: 'Digestive', date: '2024-01-12', status: 'Critical' },
   ]
 
   return (
