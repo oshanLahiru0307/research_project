@@ -1,7 +1,9 @@
 import { Link, useLocation } from 'react-router-dom'
+import { useState } from 'react'
 
 function Sidebar({ sidebarOpen }) {
   const location = useLocation()
+  const [diagnosisOpen, setDiagnosisOpen] = useState(true)
 
   const menuItems = [
     {
@@ -14,16 +16,30 @@ function Sidebar({ sidebarOpen }) {
       ),
     },
     {
-      name: 'Diagnosis',
+      name: 'Diagnose',
       path: '/diagnosis',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
         </svg>
       ),
+      submenu: [
+        {
+          name: 'Digestive',
+          path: '/diagnose/digestive/single',
+        },
+        {
+          name: 'Spinal',
+          path: '/diagnose/spinal/single',
+        },
+        {
+          name: 'Liver',
+          path: '/diagnose/liver/single',
+        },
+      ],
     },
     {
-      name: 'Patient',
+      name: 'Patients',
       path: '/patient',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -34,40 +50,92 @@ function Sidebar({ sidebarOpen }) {
   ]
 
   const isActive = (path) => {
-    if (path === '/dashboard') {
-      return location.pathname === '/dashboard'
+    if (path === '/diagnosis' || path === '/diagnose') {
+      return location.pathname.startsWith('/diagnose') || location.pathname.startsWith('/diagnosis')
     }
-    return location.pathname.startsWith(path)
+    return location.pathname === path || location.pathname.startsWith(path + '/')
   }
+
 
   return (
     <aside
-      className={`fixed top-16 left-0 h-[calc(100vh-4rem)] bg-white border-r border-gray-200 z-30 transition-all duration-300 ${
-        sidebarOpen ? 'w-64 translate-x-0' : '-translate-x-full lg:translate-x-0 lg:w-20'
+      className={`fixed top-16 left-0 h-[calc(100vh-4rem)] bg-gradient-to-b from-indigo-900 to-purple-900 transition-all duration-300 z-30 ${
+        sidebarOpen ? 'w-64' : 'w-0 overflow-hidden'
       }`}
     >
-      <nav className="p-4 space-y-2">
-        {menuItems.map((item) => (
-          <Link
-            key={item.path}
-            to={item.path}
-            className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
-              isActive(item.path)
-                ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md'
-                : 'text-gray-700 hover:bg-gray-100'
-            }`}
-          >
-            <span className="flex-shrink-0">{item.icon}</span>
-            {sidebarOpen && (
-              <span className={`font-medium ${sidebarOpen ? 'opacity-100' : 'opacity-0'}`}>
-                {item.name}
-              </span>
-            )}
-          </Link>
-        ))}
+      <nav className="h-full overflow-y-auto py-4 px-3">
+        <ul className="space-y-1">
+          {menuItems.map((item) => (
+            <li key={item.name}>
+              {item.submenu ? (
+                <>
+                  <button
+                    onClick={() => setDiagnosisOpen(!diagnosisOpen)}
+                    className={`w-full flex items-center justify-between px-4 py-3 rounded-lg transition-colors ${
+                      isActive(item.path)
+                        ? 'bg-indigo-800 text-white'
+                        : 'text-indigo-100 hover:bg-indigo-800/50'
+                    }`}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <span className={isActive(item.path) ? 'text-white' : 'text-indigo-300'}>
+                        {item.icon}
+                      </span>
+                      <span className="font-medium">{item.name}</span>
+                    </div>
+                    <svg
+                      className={`w-4 h-4 transition-transform ${diagnosisOpen ? 'rotate-180' : ''}`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                  {diagnosisOpen && (
+                    <ul className="ml-4 mt-1 space-y-1">
+                      {item.submenu.map((subItem) => {
+                        const isSubActive = location.pathname.startsWith(subItem.path)
+                        return (
+                          <li key={subItem.name}>
+                            <Link
+                              to={subItem.path}
+                              className={`block px-4 py-2 rounded-lg transition-colors ${
+                                isSubActive
+                                  ? 'bg-indigo-800 text-white font-medium'
+                                  : 'text-indigo-200 hover:bg-indigo-800/50'
+                              }`}
+                            >
+                              {subItem.name}
+                            </Link>
+                          </li>
+                        )
+                      })}
+                    </ul>
+                  )}
+                </>
+              ) : (
+                <Link
+                  to={item.path}
+                  className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
+                    isActive(item.path)
+                      ? 'bg-indigo-800 text-white'
+                      : 'text-indigo-100 hover:bg-indigo-800/50'
+                  }`}
+                >
+                  <span className={isActive(item.path) ? 'text-white' : 'text-indigo-300'}>
+                    {item.icon}
+                  </span>
+                  <span className="font-medium">{item.name}</span>
+                </Link>
+              )}
+            </li>
+          ))}
+        </ul>
       </nav>
     </aside>
   )
 }
 
 export default Sidebar
+
