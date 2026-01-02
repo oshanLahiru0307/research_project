@@ -1,16 +1,12 @@
 import { Routes, Route, Link } from 'react-router-dom'
-import DiabeticRetinopathy from './diagnosis/DiabeticRetinopathy'
-import Glaucoma from './diagnosis/Glaucoma'
-import Cataract from './diagnosis/Cataract'
-import AMD from './diagnosis/AMD'
+import ImageUpload from './diagnosis/ImageUpload'
+import DiagnosisResults from './diagnosis/DiagnosisResults'
 
 function Diagnosis() {
   return (
     <Routes>
-      <Route path="/diabetic-retinopathy" element={<DiabeticRetinopathy />} />
-      <Route path="/glaucoma" element={<Glaucoma />} />
-      <Route path="/cataract" element={<Cataract />} />
-      <Route path="/amd" element={<AMD />} />
+      <Route path="/:disease/:type" element={<ImageUpload />} />
+      <Route path="/:disease/:type/results" element={<DiagnosisResults />} />
       <Route path="/" element={<DiagnosisOverview />} />
     </Routes>
   )
@@ -19,36 +15,28 @@ function Diagnosis() {
 function DiagnosisOverview() {
   const diseases = [
     {
-      name: 'Diabetic Retinopathy',
-      path: '/diagnosis/diabetic-retinopathy',
-      description: 'Diabetes-related eye condition affecting the retina',
+      name: 'Digestive',
+      path: '/diagnosis/digestive',
+      description: 'Conditions affecting the digestive system and gastrointestinal tract',
       count: 45,
       severity: 'moderate',
       icon: '🩺',
     },
     {
-      name: 'Glaucoma',
-      path: '/diagnosis/glaucoma',
-      description: 'Increased pressure in the eye damaging the optic nerve',
+      name: 'Spinal',
+      path: '/diagnosis/spinal',
+      description: 'Spinal cord and vertebral column related conditions',
       count: 32,
       severity: 'high',
-      icon: '👁️',
+      icon: '🦴',
     },
     {
-      name: 'Cataract',
-      path: '/diagnosis/cataract',
-      description: 'Clouding of the eye\'s natural lens',
+      name: 'Liver',
+      path: '/diagnosis/liver',
+      description: 'Liver function and hepatic system disorders',
       count: 67,
       severity: 'low',
-      icon: '🔍',
-    },
-    {
-      name: 'Age-related Macular Degeneration',
-      path: '/diagnosis/amd',
-      description: 'Deterioration of the central portion of the retina',
-      count: 28,
-      severity: 'moderate',
-      icon: '👁️‍🗨️',
+      icon: '🔬',
     },
   ]
 
@@ -56,7 +44,7 @@ function DiagnosisOverview() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold text-gray-900">Disease Diagnosis & Monitoring</h1>
-        <p className="text-gray-600 mt-1">Monitor and manage patient diagnoses across different eye conditions</p>
+        <p className="text-gray-600 mt-1">Monitor and manage patient diagnoses across different medical conditions</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
