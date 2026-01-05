@@ -1,9 +1,15 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useLocation, useParams } from 'react-router-dom'
+import jsPDF from 'jspdf'
+import html2canvas from 'html2canvas'
 import DiagnosisResultTab from './tabs/DiagnosisResultTab'
 import PatientInfoTab from './tabs/PatientInfoTab'
 import MedicalHistoryTab from './tabs/MedicalHistoryTab'
 import PastDiagnosesTab from './tabs/PastDiagnosesTab'
+import ConfirmationModal from '../../components/ConfirmationModal'
+import SuccessMessage from '../../components/SuccessMessage'
+import PatientReportPDF from '../../components/PatientReportPDF'
+import PDFPreviewModal from '../../components/PDFPreviewModal'
 
 function DiagnosisResults() {
   const navigate = useNavigate()
@@ -14,15 +20,78 @@ function DiagnosisResults() {
   const [recommendedTests, setRecommendedTests] = useState([''])
   const [clinicalNotes, setClinicalNotes] = useState('')
   const [animatedConfidence, setAnimatedConfidence] = useState(0)
+  const [showConfirmModal, setShowConfirmModal] = useState(false)
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false)
+  const [showPDFReport, setShowPDFReport] = useState(false)
+  const [showPDFPreview, setShowPDFPreview] = useState(false)
+  const pdfReportRef = useRef(null)
 
   // Get image from navigation state or use placeholder
   const image = location.state?.image || 'https://via.placeholder.com/400x400?text=Medical+Scan'
 
+  // Function to get disease-specific diagnosis
+  const getDiseaseDiagnosis = (diseaseType) => {
+    const diseaseLower = diseaseType?.toLowerCase() || ''
+    
+    const diagnosisMap = {
+      'dr': 'PDR', // Proliferative Diabetic Retinopathy
+      'amd': 'No AMD', // Age-related Macular Degeneration
+      'rvo': 'No RVO', // Retinal Vein Occlusion
+      'glaucoma': 'No Glaucoma',
+      'digestive': 'Digestive',
+      'spinal': 'Spinal',
+      'liver': 'Liver'
+    }
+    
+    // If not in map, capitalize first letter of disease name
+    if (diagnosisMap[diseaseLower]) {
+      return diagnosisMap[diseaseLower]
+    } else if (diseaseType) {
+      // Capitalize first letter and return disease name
+      return diseaseType.charAt(0).toUpperCase() + diseaseType.slice(1).toLowerCase()
+    }
+    
+    return 'No Diagnosis'
+  }
+
+  // Function to get disease-specific recommendation
+  const getDiseaseRecommendation = (diseaseType, diagnosis) => {
+    const diseaseLower = diseaseType?.toLowerCase() || ''
+    const isNegative = diagnosis?.toLowerCase().includes('no')
+    
+    if (isNegative) {
+      const recommendations = {
+        'dr': 'No signs of diabetic retinopathy detected. Continue regular monitoring.',
+        'amd': 'No signs of age-related macular degeneration. Maintain regular eye exams.',
+        'rvo': 'No signs of retinal vein occlusion. Continue routine monitoring.',
+        'glaucoma': 'No signs of glaucoma detected. Regular eye pressure monitoring recommended.',
+        'digestive': 'Digestive system assessment completed. Continue regular monitoring and follow-up as needed.',
+        'spinal': 'Spinal condition assessment completed. Continue regular monitoring and follow-up as needed.',
+        'liver': 'Liver function assessment completed. Continue regular monitoring and follow-up as needed.'
+      }
+      return recommendations[diseaseLower] || 'Assessment completed. Continue regular monitoring and follow-up as needed.'
+    } else {
+      const recommendations = {
+        'dr': 'Advanced signs detected. Immediate specialist consultation recommended.',
+        'amd': 'Signs of macular degeneration detected. Specialist evaluation recommended.',
+        'rvo': 'Retinal vein occlusion signs detected. Urgent ophthalmologist consultation required.',
+        'glaucoma': 'Glaucoma signs detected. Immediate specialist consultation and treatment required.',
+        'digestive': 'Digestive system abnormalities detected. Specialist consultation recommended.',
+        'spinal': 'Spinal abnormalities detected. Immediate specialist consultation recommended.',
+        'liver': 'Liver function abnormalities detected. Specialist consultation and further evaluation required.'
+      }
+      return recommendations[diseaseLower] || 'Abnormalities detected. Specialist consultation recommended.'
+    }
+  }
+
+  // Get disease-specific diagnosis
+  const diagnosis = getDiseaseDiagnosis(disease)
+
   // Mock AI Assessment data
   const aiAssessment = {
-    diagnosis: 'PDR',
+    diagnosis: diagnosis,
     confidence: 92,
-    recommendation: 'Advanced signs detected. Immediate specialist consultation recommended.',
+    recommendation: getDiseaseRecommendation(disease, diagnosis),
   }
 
   const confidenceValue = aiAssessment.confidence
@@ -83,8 +152,150 @@ function DiagnosisResults() {
   }
 
   const handleExportPDF = () => {
-    // TODO: Implement PDF export
-    alert('PDF export functionality will be implemented')
+    // Show preview modal first
+    setShowPDFPreview(true)
+  }
+
+  const handlePrintReport = () => {
+    try {
+      // Get the preview content element
+      const previewElement = document.querySelector('[data-pdf-preview]')
+      if (!previewElement) {
+        alert('Error: Could not find report content to print')
+        return
+      }
+
+      // Create a new window for printing
+      const printWindow = window.open('', '_blank')
+      if (!printWindow) {
+        alert('Please allow popups to print the report')
+        return
+      }
+
+      // Clone the content to avoid modifying the original
+      const content = previewElement.cloneNode(true)
+      
+      // Get all styles from the document
+      const styles = Array.from(document.styleSheets)
+        .map(sheet => {
+          try {
+            return Array.from(sheet.cssRules)
+              .map(rule => rule.cssText)
+              .join('\n')
+          } catch (e) {
+            return ''
+          }
+        })
+        .join('\n')
+      
+      printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <title>Patient Report - Print</title>
+            <style>
+              ${styles}
+              @media print {
+                @page {
+                  margin: 15mm;
+                }
+                body {
+                  margin: 0;
+                  padding: 0;
+                }
+              }
+              body {
+                font-family: Arial, sans-serif;
+                margin: 0;
+                padding: 20px;
+                background: white;
+              }
+              * {
+                box-sizing: border-box;
+              }
+            </style>
+          </head>
+          <body>
+            ${content.innerHTML}
+          </body>
+        </html>
+      `)
+      printWindow.document.close()
+      
+      // Wait for content to load, then print
+      setTimeout(() => {
+        printWindow.print()
+      }, 500)
+    } catch (error) {
+      console.error('Error printing report:', error)
+      alert('Error printing report. Please try again.')
+    }
+  }
+
+  const handleDownloadPDF = async () => {
+    try {
+      // Show the PDF report component
+      setShowPDFReport(true)
+      
+      // Wait a bit for the component to render
+      await new Promise(resolve => setTimeout(resolve, 500))
+      
+      // Get the report element
+      const reportElement = pdfReportRef.current
+      if (!reportElement) {
+        alert('Error: Could not generate PDF report')
+        setShowPDFReport(false)
+        return
+      }
+
+      // Generate canvas from HTML
+      const canvas = await html2canvas(reportElement, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff'
+      })
+
+      const imgData = canvas.toDataURL('image/png')
+      
+      // Calculate PDF dimensions
+      const imgWidth = 210 // A4 width in mm
+      const pageHeight = 297 // A4 height in mm
+      const imgHeight = (canvas.height * imgWidth) / canvas.width
+      let heightLeft = imgHeight
+
+      // Create PDF
+      const pdf = new jsPDF('p', 'mm', 'a4')
+      let position = 0
+
+      // Add first page
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight)
+      heightLeft -= pageHeight
+
+      // Add additional pages if needed
+      while (heightLeft > 0) {
+        position = heightLeft - imgHeight
+        pdf.addPage()
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight)
+        heightLeft -= pageHeight
+      }
+
+      // Generate filename
+      const currentDate = new Date().toISOString().split('T')[0]
+      const filename = `Patient_Report_${currentDate}.pdf`
+
+      // Save PDF
+      pdf.save(filename)
+      
+      // Hide the PDF report component and preview
+      setShowPDFReport(false)
+      setShowPDFPreview(false)
+    } catch (error) {
+      console.error('Error generating PDF:', error)
+      alert('Error generating PDF. Please try again.')
+      setShowPDFReport(false)
+      setShowPDFPreview(false)
+    }
   }
 
   const handleAddTest = () => {
@@ -105,14 +316,24 @@ function DiagnosisResults() {
   }
 
   const handleSavePrescription = () => {
-    // TODO: Implement save functionality
+    // Show confirmation modal
+    setShowConfirmModal(true)
+  }
+
+  const handleConfirmSave = () => {
+    // Close confirmation modal
+    setShowConfirmModal(false)
+    
+    // Save prescription data
     const prescriptionData = {
       prescribedMedicine,
       recommendedTests: recommendedTests.filter((test) => test.trim() !== ''),
       clinicalNotes,
     }
     console.log('Saving prescription:', prescriptionData)
-    alert('Prescription saved successfully!')
+    
+    // Show success message
+    setShowSuccessMessage(true)
   }
 
   const tabs = [
@@ -192,6 +413,56 @@ function DiagnosisResults() {
 
         {activeTab === 'past' && <PastDiagnosesTab />}
       </div>
+
+      {/* Confirmation Modal */}
+      <ConfirmationModal
+        open={showConfirmModal}
+        onClose={() => setShowConfirmModal(false)}
+        onConfirm={handleConfirmSave}
+        title="Confirm Save Prescription"
+        message="Are you sure you want to save this prescription? This action cannot be undone."
+      />
+
+      {/* Success Message */}
+      <SuccessMessage
+        open={showSuccessMessage}
+        onClose={() => setShowSuccessMessage(false)}
+        message="Prescription saved successfully!"
+      />
+
+      {/* PDF Preview Modal */}
+      <PDFPreviewModal
+        open={showPDFPreview}
+        onClose={() => setShowPDFPreview(false)}
+        onPrint={handlePrintReport}
+        onDownload={handleDownloadPDF}
+      >
+        <PatientReportPDF
+          patientData={null}
+          aiAssessment={aiAssessment}
+          image={image}
+          prescribedMedicine={prescribedMedicine}
+          recommendedTests={recommendedTests}
+          clinicalNotes={clinicalNotes}
+          disease={disease}
+        />
+      </PDFPreviewModal>
+
+      {/* PDF Report (hidden, used for PDF generation) */}
+      {showPDFReport && (
+        <div className="fixed inset-0 -z-10 opacity-0 pointer-events-none overflow-hidden" style={{ width: '210mm', left: '-9999px' }}>
+          <PatientReportPDF
+            ref={pdfReportRef}
+            patientData={null}
+            aiAssessment={aiAssessment}
+            image={image}
+            prescribedMedicine={prescribedMedicine}
+            recommendedTests={recommendedTests}
+            clinicalNotes={clinicalNotes}
+            disease={disease}
+          />
+        </div>
+      )}
     </div>
   )
 }
