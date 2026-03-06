@@ -7,7 +7,7 @@ import numpy as np
 import cv2
 from PIL import Image
 
-import config
+import python_backend.config_files.config as config
 
 _model = None
 

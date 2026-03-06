@@ -7,7 +7,7 @@ Classification: digestive vs normal
 import os
 from flask import Flask, request, jsonify
 
-import config
+import python_backend.config_files.config as config
 from model_utils import load_model, preprocess_image, predict
 
 app = Flask(__name__)
