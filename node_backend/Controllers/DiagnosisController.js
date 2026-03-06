@@ -66,11 +66,29 @@ const updateDiagnosis = async (req, res) => {
   }
 };
 
+const getDiagnosisById = async (req, res) => {
+  try {
+    const diagnosis = await Diagnosis.findById(req.params.id)
+      .populate('patient')
+      .populate('createdBy', 'name email role');
+
+    if (!diagnosis) {
+      return res.status(404).json({ message: 'Diagnosis not found' });
+    }
+
+    return res.status(200).json(diagnosis);
+  } catch (error) {
+    console.error('Error fetching diagnosis:', error);
+    return res.status(500).json({ message: 'Error fetching diagnosis' });
+  }
+};
+
 
 
 module.exports = {
 getDiagnoses,
 deleteDiagnosis,
 updateDiagnosis,
+getDiagnosisById,
 };
 
