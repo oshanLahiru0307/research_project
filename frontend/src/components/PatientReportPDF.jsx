@@ -10,19 +10,42 @@ const PatientReportPDF = forwardRef(function PatientReportPDF({
   disease 
 }, ref) {
 
-  // Mock patient data - in real app, this would come from props or context
-  const patient = patientData || {
-    id: 'P3',
-    name: 'Sethupriyan',
-    age: 24,
-    gender: 'Male',
-    phone: '+1 234 567 8900',
-    email: 'sethu@gmail.com',
-    bloodType: 'AB+',
-    height: '180 cm',
-    weight: '40 kg',
-    bmi: '25.5',
-    status: 'Active Patient'
+  // Normalize patient data - support both API shape (firstName, lastName) and legacy shape (name)
+  const normalizePatient = (data) => {
+    if (!data) return null
+    const name = data.name || [data.firstName, data.lastName].filter(Boolean).join(' ') || '—'
+    let age = data.age
+    if (!age && data.dateOfBirth) {
+      const d = new Date(data.dateOfBirth)
+      age = isNaN(d.getTime()) ? '—' : `${new Date().getFullYear() - d.getFullYear()} years`
+    }
+    return {
+      id: data._id || data.id || '—',
+      name,
+      age: age ?? '—',
+      gender: data.gender ?? '—',
+      phone: data.phone ?? '—',
+      email: data.email ?? '—',
+      bloodType: data.bloodType ?? '—',
+      height: data.height ?? '—',
+      weight: data.weight ?? '—',
+      bmi: data.bmi ?? '—',
+      status: data.status ?? '—',
+    }
+  }
+
+  const patient = normalizePatient(patientData) || {
+    id: '—',
+    name: '—',
+    age: '—',
+    gender: '—',
+    phone: '—',
+    email: '—',
+    bloodType: '—',
+    height: '—',
+    weight: '—',
+    bmi: '—',
+    status: '—',
   }
 
   // Function to get disease-specific diagnosis name
