@@ -45,10 +45,32 @@ const deleteDiagnosis = async (req, res) => {
   }
 };
 
+const updateDiagnosis = async (req, res) => {
+  try {
+    const updates = req.body;
+
+    const diagnosis = await Diagnosis.findByIdAndUpdate(
+      req.params.id,
+      updates,
+      { new: true, runValidators: true }
+    );
+
+    if (!diagnosis) {
+      return res.status(404).json({ message: 'Diagnosis not found' });
+    }
+
+    return res.status(200).json(diagnosis);
+  } catch (error) {
+    console.error('Error updating diagnosis:', error);
+    return res.status(500).json({ message: 'Error updating diagnosis' });
+  }
+};
+
 
 
 module.exports = {
 getDiagnoses,
-deleteDiagnosis
+deleteDiagnosis,
+updateDiagnosis,
 };
 
