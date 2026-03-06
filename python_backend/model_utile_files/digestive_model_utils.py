@@ -7,7 +7,7 @@ import numpy as np
 import cv2
 from PIL import Image
 
-import python_backend.config_files.config as config
+import python_backend.config_files.digestive_model_config as digestive_model_config
 
 _model = None
 
@@ -17,9 +17,9 @@ def load_model():
     global _model
     if _model is None:
         import tensorflow as tf
-        if not os.path.exists(config.MODEL_PATH):
-            raise FileNotFoundError(f"Model not found at {config.MODEL_PATH}")
-        _model = tf.keras.models.load_model(config.MODEL_PATH)
+        if not os.path.exists(digestive_model_config.MODEL_PATH):
+            raise FileNotFoundError(f"Model not found at {digestive_model_config.MODEL_PATH}")
+        _model = tf.keras.models.load_model(digestive_model_config.MODEL_PATH)
     return _model
 
 
@@ -35,7 +35,7 @@ def preprocess_image(image_bytes: bytes) -> np.ndarray:
     else:
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
-    img = cv2.resize(img, (config.IMG_SIZE, config.IMG_SIZE))
+    img = cv2.resize(img, (digestive_model_config.IMG_SIZE, digestive_model_config.IMG_SIZE))
     img = np.array(img, dtype=np.float32)
     img = np.expand_dims(img, axis=0)
     return img
@@ -49,13 +49,13 @@ def predict(image_array: np.ndarray) -> dict:
     predictions = model.predict(image_array, verbose=0)
     probs = predictions[0]
     pred_idx = int(np.argmax(probs))
-    pred_class = config.CLASSES[pred_idx]
+    pred_class = digestive_model_config.CLASSES[pred_idx]
     confidence = float(probs[pred_idx])
 
     return {
         'prediction': pred_class,
         'confidence': round(confidence, 4),
         'probabilities': {
-            cls: round(float(p), 4) for cls, p in zip(config.CLASSES, probs)
+            cls: round(float(p), 4) for cls, p in zip(digestive_model_config.CLASSES, probs)
         }
     }
