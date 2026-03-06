@@ -1,13 +1,34 @@
-const mongoose = require('mongoose');
 const User = require('../Models/UserSchema');
+const bcrypt = require('bcryptjs');
 
 // Create a new user
 const createUser = async (req, res) => {
     try {
         const { name, email, password, role } = req.body;
+
+        if (!name || !email || !password) {
+            return res.status(400).json({ message: 'Name, email and password are required' });
+        }
+
+        const existing = await User.findOne({ email: email.toLowerCase() });
+        if (existing) {
+            return res.status(409).json({ message: 'User with this email already exists' });
+        }
+
         const newUser = new User({ name, email, password, role });
         await newUser.save();
-        res.status(201).json(newUser);
+
+        const userSafe = {
+            id: newUser._id,
+            name: newUser.name,
+            email: newUser.email,
+            role: newUser.role,
+            isActive: newUser.isActive,
+            createdAt: newUser.createdAt,
+            updatedAt: newUser.updatedAt,
+        };
+
+        res.status(201).json(userSafe);
     } catch (error) {
         res.status(500).json({ message: 'Error creating user', error });
     }
@@ -16,7 +37,7 @@ const createUser = async (req, res) => {
 // Get all users
 const getAllUsers = async (req, res) => {
     try {
-        const users = await User.find();
+        const users = await User.find().select('-password');
         res.status(200).json(users);
     } catch (error) {
         res.status(500).json({ message: 'Error fetching users', error });
@@ -25,7 +46,7 @@ const getAllUsers = async (req, res) => {
 
 const getUserById = async (req, res) => {
     try {
-        const user = await User.findById(req.params.id);
+        const user = await User.findById(req.params.id).select('-password');
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
@@ -38,12 +59,25 @@ const getUserById = async (req, res) => {
 // Update a user
 const updateUser = async (req, res) => {
     try {
-        const { name, email, password, role } = req.body;
+        const { name, email, password, role, isActive } = req.body;
+
+        const update = {
+            name,
+            email,
+            role,
+            isActive,
+        };
+
+        if (password) {
+            const salt = await bcrypt.genSalt(10);
+            update.password = await bcrypt.hash(password, salt);
+        }
+
         const updatedUser = await User.findByIdAndUpdate(
             req.params.id,
-            { name, email, password, role },
-            { new: true }
-        );  
+            update,
+            { new: true, runValidators: true }
+        ).select('-password');  
         if (!updatedUser) {
             return res.status(404).json({ message: 'User not found' });
         }
