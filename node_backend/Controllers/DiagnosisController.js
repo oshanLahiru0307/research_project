@@ -31,9 +31,24 @@ const getDiagnoses = async (req, res) => {
   }
 };
 
+const deleteDiagnosis = async (req, res) => {
+  try {
+    const diagnosis = await Diagnosis.findByIdAndDelete(req.params.id);
+    if (!diagnosis) {
+      return res.status(404).json({ message: 'Diagnosis not found' });
+    }
+
+    return res.status(200).json({ message: 'Diagnosis deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting diagnosis:', error);
+    return res.status(500).json({ message: 'Error deleting diagnosis' });
+  }
+};
+
 
 
 module.exports = {
-getDiagnoses
+getDiagnoses,
+deleteDiagnosis
 };
 
