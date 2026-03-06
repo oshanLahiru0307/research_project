@@ -110,14 +110,37 @@ const updatePatient = async (req, res) => {
   }
 };
 
+const deletePatient = async (req, res) => {
+  try {
+    const patient = await Patient.findByIdAndDelete(req.params.id);
+    if (!patient) {
+      return res.status(404).json({ message: 'Patient not found' });
+    }
 
+    return res.status(200).json({ message: 'Patient deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting patient:', error);
+    return res.status(500).json({ message: 'Error deleting patient' });
+  }
+};
+
+//get patients by createdUser id
+const getPatientsByCreatedUserId = async (req, res) => {
+  try {
+    const patients = await Patient.find({ createdBy: req.user.id });
+    return res.status(200).json(patients);
+  } catch (error) {
+    console.error('Error fetching patients by created user id:', error);
+    return res.status(500).json({ message: 'Error fetching patients by created user id' });
+  }
+};
 
 module.exports = {
   createPatient,
   getPatients,
   getPatientById,
   updatePatient,
-  //deletePatient,
-  //getPatientsByCreatedUserId,
+  deletePatient,
+  getPatientsByCreatedUserId,
 };
 
