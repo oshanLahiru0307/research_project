@@ -75,11 +75,48 @@ const getPatients = async (req, res) => {
   }
 };
 
+const getPatientById = async (req, res) => {
+  try {
+    const patient = await Patient.findById(req.params.id);
+    if (!patient) {
+      return res.status(404).json({ message: 'Patient not found' });
+    }
+
+    return res.status(200).json(patient);
+  } catch (error) {
+    console.error('Error fetching patient:', error);
+    return res.status(500).json({ message: 'Error fetching patient' });
+  }
+};
+
+const updatePatient = async (req, res) => {
+  try {
+    const updates = req.body;
+
+    const patient = await Patient.findByIdAndUpdate(
+      req.params.id,
+      updates,
+      { new: true, runValidators: true }
+    );
+
+    if (!patient) {
+      return res.status(404).json({ message: 'Patient not found' });
+    }
+
+    return res.status(200).json(patient);
+  } catch (error) {
+    console.error('Error updating patient:', error);
+    return res.status(500).json({ message: 'Error updating patient' });
+  }
+};
+
+
+
 module.exports = {
   createPatient,
-  //getPatients,
-  //getPatientById,
-  //updatePatient,
+  getPatients,
+  getPatientById,
+  updatePatient,
   //deletePatient,
   //getPatientsByCreatedUserId,
 };
