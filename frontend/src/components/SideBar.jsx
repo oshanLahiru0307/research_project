@@ -26,15 +26,15 @@ function Sidebar({ sidebarOpen }) {
       submenu: [
         {
           name: 'Digestive',
-          path: '/diagnose/digestive/single',
+          path: '/diagnose/digestive',
         },
         {
           name: 'Spinal',
-          path: '/diagnose/spinal/single',
+          path: '/diagnose/spinal',
         },
         {
           name: 'Liver',
-          path: '/diagnose/liver/single',
+          path: '/diagnose/liver',
         },
       ],
     },
