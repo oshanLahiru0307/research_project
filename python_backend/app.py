@@ -7,11 +7,11 @@ Classification: digestive vs normal
 import os
 from flask import Flask, request, jsonify
 
-import python_backend.config_files.config as config
+import python_backend.config_files.digestive_model_config as digestive_model_config
 from model_utils import load_model, preprocess_image, predict
 
 app = Flask(__name__)
-app.config['MAX_CONTENT_LENGTH'] = config.MAX_CONTENT_LENGTH
+app.config['MAX_CONTENT_LENGTH'] = digestive_model_config.MAX_CONTENT_LENGTH
 
 
 @app.route('/health', methods=['GET'])
@@ -56,16 +56,16 @@ def predict_endpoint():
 def model_info():
     """Return model configuration and class labels."""
     return jsonify({
-        'classes': config.CLASSES,
-        'input_size': [config.IMG_SIZE, config.IMG_SIZE],
-        'model_path': config.MODEL_PATH,
+        'classes': digestive_model_config.CLASSES,
+        'input_size': [digestive_model_config.IMG_SIZE, digestive_model_config.IMG_SIZE],
+        'model_path': digestive_model_config.MODEL_PATH,
     })
 
 
 if __name__ == '__main__':
-    if os.path.exists(config.MODEL_PATH):
+    if os.path.exists(digestive_model_config.MODEL_PATH):
         load_model()
-        print(f"Model loaded from {config.MODEL_PATH}")
+        print(f"Model loaded from {digestive_model_config.MODEL_PATH}")
     else:
-        print(f"Warning: Model not found at {config.MODEL_PATH}. /predict will fail until model is available.")
-    app.run(host=config.HOST, port=config.PORT, debug=False)
+        print(f"Warning: Model not found at {digestive_model_config.MODEL_PATH}. /predict will fail until model is available.")
+    app.run(host=digestive_model_config.HOST, port=digestive_model_config.PORT, debug=False)
