@@ -1,5 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
-import { AuthProvider, useAuth } from './context/AuthContext'
+import { useAuth } from './context/AuthContext'
+import { AuthProviderWithStore } from './context/AuthProviderWithStore'
+
 import Login from './pages/Login'
 import Layout from './components/Layout'
 import Dashboard from './pages/Dashboard'
@@ -45,11 +47,11 @@ function AppRoutes() {
 
 function App() {
   return (
-    <AuthProvider>
+    <AuthProviderWithStore>
       <Router>
         <AppRoutes />
       </Router>
-    </AuthProvider>
+    </AuthProviderWithStore>
   )
 }
 
