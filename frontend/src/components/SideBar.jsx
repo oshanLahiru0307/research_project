@@ -26,7 +26,11 @@ function Sidebar({ sidebarOpen }) {
       submenu: [
         {
           name: 'Digestive',
-          path: '/diagnose/digestive',
+          path: '/diagnose/digestive/single',
+
+        }, {
+          name: 'Iris Analysis',
+          path: '/iris/detection',
         },
         {
           name: 'Spinal',
