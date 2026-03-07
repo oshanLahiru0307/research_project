@@ -10,8 +10,11 @@ import ConfirmationModal from '../../components/ConfirmationModal'
 import SuccessMessage from '../../components/SuccessMessage'
 import PatientReportPDF from '../../components/PatientReportPDF'
 import PDFPreviewModal from '../../components/PDFPreviewModal'
+import { useDispatch } from 'react-redux'
+import { createDiagnosisThunk } from '../../state/diagnosesSlice'
 
 function DiagnosisResults() {
+  const dispatch = useDispatch()
   const navigate = useNavigate()
   const location = useLocation()
   const { disease, type } = useParams()
@@ -24,10 +27,15 @@ function DiagnosisResults() {
   const [showSuccessMessage, setShowSuccessMessage] = useState(false)
   const [showPDFReport, setShowPDFReport] = useState(false)
   const [showPDFPreview, setShowPDFPreview] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
   const pdfReportRef = useRef(null)
 
-  // Get image from navigation state or use placeholder
+  // Get image, aiResult, patient, eye, and original file from navigation state
   const image = location.state?.image || 'https://via.placeholder.com/400x400?text=Medical+Scan'
+  const aiResult = location.state?.aiResult
+  const patient = location.state?.patient || null
+  const eye = location.state?.eye || 'LEFT'
+  const imageFile = location.state?.file || null
 
   // Function to get disease-specific diagnosis
   const getDiseaseDiagnosis = (diseaseType) => {
@@ -84,16 +92,35 @@ function DiagnosisResults() {
     }
   }
 
-  // Get disease-specific diagnosis
-  const diagnosis = getDiseaseDiagnosis(disease)
+  // Build AI Assessment from API result (digestive) or fallback
+  const getAiAssessment = () => {
+    if (disease === 'digestive' && aiResult) {
+      const pred = aiResult.prediction
+      const conf = aiResult.confidence ?? 0
+      const confPercent = typeof conf === 'number' && conf <= 1 ? conf * 100 : conf
+      const diagnosisLabel = pred === 'digestive' ? 'Digestive Abnormality' : 'Normal'
+      const recommendation =
+        pred === 'normal'
+          ? 'No signs of digestive abnormality detected. Continue regular monitoring and follow-up as needed.'
+          : 'Digestive abnormality detected. Specialist consultation recommended.'
 
-  // Mock AI Assessment data
-  const aiAssessment = {
-    diagnosis: diagnosis,
-    confidence: 92,
-    recommendation: getDiseaseRecommendation(disease, diagnosis),
+      return {
+        diagnosis: diagnosisLabel,
+        confidence: confPercent,
+        recommendation,
+        probabilities: aiResult.probabilities,
+      }
+    }
+    const baseDiagnosis = getDiseaseDiagnosis(disease)
+    return {
+      diagnosis: baseDiagnosis,
+      confidence: 92,
+      recommendation: getDiseaseRecommendation(disease, baseDiagnosis),
+      probabilities: null,
+    }
   }
 
+  const aiAssessment = getAiAssessment()
   const confidenceValue = aiAssessment.confidence
 
   const animationRef = useRef(null)
@@ -148,7 +175,7 @@ function DiagnosisResults() {
   }, [activeTab, confidenceValue])
 
   const handleNewScan = () => {
-    navigate(`/diagnose/${disease}/${type}`)
+    navigate(`/diagnose/${disease}/upload`, { state: { patient } })
   }
 
   const handleExportPDF = () => {
@@ -316,24 +343,38 @@ function DiagnosisResults() {
   }
 
   const handleSavePrescription = () => {
-    // Show confirmation modal
     setShowConfirmModal(true)
   }
 
-  const handleConfirmSave = () => {
-    // Close confirmation modal
+  const handleConfirmSave = async () => {
     setShowConfirmModal(false)
-    
-    // Save prescription data
-    const prescriptionData = {
-      prescribedMedicine,
-      recommendedTests: recommendedTests.filter((test) => test.trim() !== ''),
-      clinicalNotes,
+    setIsSaving(true)
+
+    try {
+      const payload = {
+        disease,
+        diagnosis: aiAssessment.diagnosis,
+        eye,
+        confidence: aiAssessment.confidence,
+        status: 'Checked',
+        prescribedMedicine,
+        recommendedTests: recommendedTests.filter((test) => test.trim() !== ''),
+        clinicalNotes,
+        imageFile,
+        patientId: patient?.id,
+      }
+
+      const resultAction = await dispatch(createDiagnosisThunk(payload))
+      if (createDiagnosisThunk.rejected.match(resultAction)) {
+        throw new Error(resultAction.payload || 'Error saving prescription')
+      }
+      setShowSuccessMessage(true)
+    } catch (error) {
+      console.error('Error saving diagnosis:', error)
+      alert(error?.data?.message || error.message || 'Error saving prescription')
+    } finally {
+      setIsSaving(false)
     }
-    console.log('Saving prescription:', prescriptionData)
-    
-    // Show success message
-    setShowSuccessMessage(true)
   }
 
   const tabs = [
@@ -407,9 +448,9 @@ function DiagnosisResults() {
           />
         )}
 
-        {activeTab === 'patient' && <PatientInfoTab />}
+        {activeTab === 'patient' && <PatientInfoTab patient={patient} />}
 
-        {activeTab === 'history' && <MedicalHistoryTab />}
+        {activeTab === 'history' && <MedicalHistoryTab patient={patient} />}
 
         {activeTab === 'past' && <PastDiagnosesTab />}
       </div>
@@ -427,7 +468,7 @@ function DiagnosisResults() {
       <SuccessMessage
         open={showSuccessMessage}
         onClose={() => setShowSuccessMessage(false)}
-        message="Prescription saved successfully!"
+        message={isSaving ? 'Saving prescription...' : 'Prescription saved successfully!'}
       />
 
       {/* PDF Preview Modal */}
@@ -438,7 +479,7 @@ function DiagnosisResults() {
         onDownload={handleDownloadPDF}
       >
         <PatientReportPDF
-          patientData={null}
+          patientData={patient}
           aiAssessment={aiAssessment}
           image={image}
           prescribedMedicine={prescribedMedicine}
@@ -453,7 +494,7 @@ function DiagnosisResults() {
         <div className="fixed inset-0 -z-10 opacity-0 pointer-events-none overflow-hidden" style={{ width: '210mm', left: '-9999px' }}>
           <PatientReportPDF
             ref={pdfReportRef}
-            patientData={null}
+            patientData={patient}
             aiAssessment={aiAssessment}
             image={image}
             prescribedMedicine={prescribedMedicine}
