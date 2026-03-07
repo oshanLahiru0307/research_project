@@ -34,11 +34,11 @@ function Sidebar({ sidebarOpen }) {
         },
         {
           name: 'Spinal',
-          path: '/diagnose/spinal/single',
+          path: '/diagnose/spinal',
         },
         {
           name: 'Liver',
-          path: '/diagnose/liver/single',
+          path: '/diagnose/liver',
         },
       ],
     },

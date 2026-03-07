@@ -1,12 +1,14 @@
 import { Routes, Route, Link } from 'react-router-dom'
 import ImageUpload from './diagnosis/ImageUpload'
 import DiagnosisResults from './diagnosis/DiagnosisResults'
+import PatientsListForDiagnosis from './diagnosis/PatientsListForDiagnosis'
 
 function Diagnosis() {
   return (
     <Routes>
-      <Route path="/:disease/:type" element={<ImageUpload />} />
       <Route path="/:disease/:type/results" element={<DiagnosisResults />} />
+      <Route path="/:disease/upload" element={<ImageUpload />} />
+      <Route path="/:disease" element={<PatientsListForDiagnosis />} />
       <Route path="/" element={<DiagnosisOverview />} />
     </Routes>
   )
@@ -16,7 +18,7 @@ function DiagnosisOverview() {
   const diseases = [
     {
       name: 'Digestive',
-      path: '/diagnosis/digestive',
+      path: '/diagnose/digestive',
       description: 'Conditions affecting the digestive system and gastrointestinal tract',
       count: 45,
       severity: 'moderate',
@@ -24,7 +26,7 @@ function DiagnosisOverview() {
     },
     {
       name: 'Spinal',
-      path: '/diagnosis/spinal',
+      path: '/diagnose/spinal',
       description: 'Spinal cord and vertebral column related conditions',
       count: 32,
       severity: 'high',
@@ -32,7 +34,7 @@ function DiagnosisOverview() {
     },
     {
       name: 'Liver',
-      path: '/diagnosis/liver',
+      path: '/diagnose/liver',
       description: 'Liver function and hepatic system disorders',
       count: 67,
       severity: 'low',

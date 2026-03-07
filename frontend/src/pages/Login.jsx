@@ -8,15 +8,20 @@ function Login() {
     password: ''
   })
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState(null)
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     setIsLoading(true)
-    // Simulate login
-    setTimeout(() => {
-      login()
+    setError(null)
+
+    try {
+      await login(formData.email, formData.password)
+    } catch (err) {
+      setError(err?.data?.message || err.message || 'Login failed')
+    } finally {
       setIsLoading(false)
-    }, 500)
+    }
   }
 
   const handleChange = (e) => {
@@ -85,6 +90,12 @@ function Login() {
                 Forgot password?
               </a>
             </div>
+
+            {error && (
+              <p className="text-sm text-red-600 mt-2">
+                {error}
+              </p>
+            )}
 
             <button
               type="submit"
