@@ -1,88 +1,17 @@
 import { useState, useEffect } from 'react'
-
-// Import eye images
-import eyeImage1 from '../../../assets/eye_images/1-543.JPG'
-import eyeImage2 from '../../../assets/eye_images/1-556.JPG'
-import eyeImage3 from '../../../assets/eye_images/1-580.JPG'
-import eyeImage4 from '../../../assets/eye_images/1-585.JPG'
-import eyeImage5 from '../../../assets/eye_images/1-592.JPG'
-import eyeImage6 from '../../../assets/eye_images/1-595.JPG'
+import { useDispatch, useSelector } from 'react-redux'
+import { fetchDiagnosesThunk } from '../../../state/diagnosesSlice'
 
 function PastDiagnosesTab() {
-  // Get eye images from assets
-  const eyeImages = [
-    eyeImage1,
-    eyeImage2,
-    eyeImage3,
-    eyeImage4,
-    eyeImage5,
-    eyeImage6,
-  ]
-
-  const pastDiagnoses = [
-    {
-      id: 1,
-      image: eyeImages[0],
-      disease: 'Digestive',
-      diagnosis: 'Digestive',
-      eye: 'LEFT',
-      date: '3/20/2025',
-      status: 'Checked',
-      confidence: 76.6,
-    },
-    {
-      id: 2,
-      image: eyeImages[1],
-      disease: 'Liver',
-      diagnosis: 'Liver',
-      eye: 'LEFT',
-      date: '3/20/2025',
-      status: 'Checked',
-      confidence: 57.9,
-    },
-    {
-      id: 3,
-      image: eyeImages[2],
-      disease: 'Spinal',
-      diagnosis: 'Spinal',
-      eye: 'LEFT',
-      date: '3/20/2025',
-      status: 'Checked',
-      confidence: 76.6,
-    },
-    {
-      id: 4,
-      image: eyeImages[3],
-      disease: 'Digestive',
-      diagnosis: 'Digestive',
-      eye: 'LEFT',
-      date: '3/20/2025',
-      status: 'Unchecked',
-      confidence: 57.8,
-    },
-    {
-      id: 5,
-      image: eyeImages[4],
-      disease: 'Liver',
-      diagnosis: 'Liver',
-      eye: 'LEFT',
-      date: '3/20/2025',
-      status: 'Checked',
-      confidence: 57.8,
-    },
-    {
-      id: 6,
-      image: eyeImages[5],
-      disease: 'Spinal',
-      diagnosis: 'Spinal',
-      eye: 'LEFT',
-      date: '3/20/2025',
-      status: 'Checked',
-      confidence: 91.5,
-    },
-  ]
-
+  const dispatch = useDispatch()
+  const { items: pastDiagnoses, status, error } = useSelector((state) => state.diagnoses)
   const [openActions, setOpenActions] = useState(null)
+
+  useEffect(() => {
+    if (status === 'idle') {
+      dispatch(fetchDiagnosesThunk())
+    }
+  }, [dispatch, status])
 
   const handleViewClick = (id, e) => {
     e.stopPropagation()
@@ -118,6 +47,12 @@ function PastDiagnosesTab() {
           </div>
         </div>
 
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm mb-4">
+            {error}
+          </div>
+        )}
+
         <div className="overflow-x-auto">
           <table className="w-full border-collapse">
             <thead>
@@ -133,12 +68,31 @@ function PastDiagnosesTab() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {pastDiagnoses.map((diagnosis) => (
-                <tr key={diagnosis.id} className="hover:bg-gray-50 transition-colors">
+              {status === 'loading' && pastDiagnoses.length === 0 && (
+                <tr>
+                  <td colSpan="8" className="px-4 py-6 text-center text-sm text-gray-500">
+                    Loading diagnoses...
+                  </td>
+                </tr>
+              )}
+              {status === 'succeeded' && pastDiagnoses.length === 0 && (
+                <tr>
+                  <td colSpan="8" className="px-4 py-6 text-center text-sm text-gray-500">
+                    No past diagnoses found.
+                  </td>
+                </tr>
+              )}
+              {pastDiagnoses.map((diagnosis) => {
+                const imageSrc = diagnosis.imageUrl || 'https://via.placeholder.com/64x64?text=Scan'
+                const date = diagnosis.createdAt
+                  ? new Date(diagnosis.createdAt).toLocaleDateString()
+                  : ''
+                return (
+                <tr key={diagnosis._id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-4 py-3 whitespace-nowrap">
                     <div className="w-16 h-16 rounded-lg overflow-hidden border border-gray-200 bg-gray-100">
                       <img
-                        src={diagnosis.image}
+                        src={imageSrc}
                         alt="Eye scan"
                         className="w-full h-full object-cover"
                         onError={(e) => {
@@ -178,7 +132,7 @@ function PastDiagnosesTab() {
                     </div>
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap">
-                    <span className="text-sm text-gray-700">{diagnosis.date}</span>
+                    <span className="text-sm text-gray-700">{date}</span>
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap">
                     <span
@@ -190,11 +144,13 @@ function PastDiagnosesTab() {
                     </span>
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap">
-                    <span className="text-sm font-medium text-gray-900">{diagnosis.confidence}%</span>
+                    <span className="text-sm font-medium text-gray-900">
+                      {diagnosis.confidence != null ? `${diagnosis.confidence}%` : 'N/A'}
+                    </span>
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap relative actions-dropdown">
                     <button
-                      onClick={(e) => handleViewClick(diagnosis.id, e)}
+                      onClick={(e) => handleViewClick(diagnosis._id, e)}
                       className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-indigo-600 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition-colors"
                     >
                       View
@@ -207,7 +163,7 @@ function PastDiagnosesTab() {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                       </svg>
                     </button>
-                    {openActions === diagnosis.id && (
+                    {openActions === diagnosis._id && (
                       <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
                         <button 
                           onClick={(e) => e.stopPropagation()}
@@ -231,7 +187,7 @@ function PastDiagnosesTab() {
                     )}
                   </td>
                 </tr>
-              ))}
+              )})}
             </tbody>
           </table>
         </div>
