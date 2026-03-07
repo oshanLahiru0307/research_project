@@ -1,13 +1,28 @@
-function MedicalHistoryTab() {
+function MedicalHistoryTab({ patient }) {
+  const patientName = patient
+    ? [patient.firstName, patient.lastName].filter(Boolean).join(' ') || '—'
+    : null
+
   return (
     <div className="h-full overflow-y-auto">
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-2xl font-semibold text-gray-900">Medical History</h3>
+          <div>
+            <h3 className="text-2xl font-semibold text-gray-900">Medical History</h3>
+            {patientName && (
+              <p className="text-sm text-gray-600 mt-1">Patient: {patientName}</p>
+            )}
+          </div>
           <button className="px-4 py-2 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
             Add Record
           </button>
         </div>
+
+        {!patient && (
+          <div className="text-center py-8 text-gray-500 text-sm mb-6">
+            No patient selected. Patient-specific medical history will appear here when a patient is selected.
+          </div>
+        )}
 
         <div className="space-y-6">
           {/* Allergies */}
