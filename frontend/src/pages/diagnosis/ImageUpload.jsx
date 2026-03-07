@@ -1,12 +1,18 @@
 import { useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, useLocation } from 'react-router-dom'
+import { predictDigestive } from '../../api/digestiveApi'
 
 function ImageUpload() {
   const navigate = useNavigate()
-  const { disease, type } = useParams()
+  const location = useLocation()
+  const { disease } = useParams()
+  const patient = location.state?.patient || null
+
   const [dragActive, setDragActive] = useState(false)
   const [selectedFile, setSelectedFile] = useState(null)
   const [preview, setPreview] = useState(null)
+  const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const [selectedEye, setSelectedEye] = useState('LEFT')
 
   const diseaseNames = {
     digestive: 'Digestive',
@@ -55,12 +61,40 @@ function ImageUpload() {
     }
   }
 
-  const handleUpload = () => {
-    if (selectedFile) {
-      // Navigate to results page with the uploaded image
-      navigate(`/diagnose/${disease}/${type}/results`, {
-        state: { image: preview, fileName: selectedFile.name },
-      })
+  const handleUpload = async () => {
+    if (!selectedFile || isAnalyzing) return
+    setIsAnalyzing(true)
+
+    try {
+      if (disease === 'digestive') {
+        const apiResult = await predictDigestive(selectedFile)
+        navigate(`/diagnose/${disease}/upload/results`, {
+          state: {
+            image: preview,
+            fileName: selectedFile.name,
+            aiResult: apiResult,
+            patient,
+            eye: selectedEye,
+            file: selectedFile,
+          },
+        })
+      } else {
+        navigate(`/diagnose/${disease}/upload/results`, {
+          state: {
+            image: preview,
+            fileName: selectedFile.name,
+            aiResult: null,
+            patient,
+            eye: selectedEye,
+            file: selectedFile,
+          },
+        })
+      }
+    } catch (err) {
+      const msg = err?.response?.data?.error || err?.message || 'Analysis failed'
+      alert(msg)
+    } finally {
+      setIsAnalyzing(false)
     }
   }
 
@@ -100,29 +134,75 @@ function ImageUpload() {
           >
             {preview ? (
               <div className="space-y-4">
+                {/* Left / Right Eye Selector */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Select Eye
+                  </label>
+                  <div className="flex gap-4">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="eye"
+                        value="LEFT"
+                        checked={selectedEye === 'LEFT'}
+                        onChange={() => setSelectedEye('LEFT')}
+                        className="text-indigo-600 focus:ring-indigo-500"
+                      />
+                      <span className="text-sm font-medium text-gray-700">
+                        Left Eye
+                      </span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="eye"
+                        value="RIGHT"
+                        checked={selectedEye === 'RIGHT'}
+                        onChange={() => setSelectedEye('RIGHT')}
+                        className="text-indigo-600 focus:ring-indigo-500"
+                      />
+                      <span className="text-sm font-medium text-gray-700">
+                        Right Eye
+                      </span>
+                    </label>
+                  </div>
+                </div>
+
                 <img
                   src={preview}
                   alt="Preview"
                   className="max-w-md mx-auto rounded-lg shadow-md"
                 />
                 <p className="text-sm text-gray-600">{selectedFile?.name}</p>
-                <div className="flex justify-center space-x-4">
-                  <button
-                    onClick={() => {
-                      setSelectedFile(null)
-                      setPreview(null)
-                    }}
-                    className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-                  >
-                    Remove
-                  </button>
-                  <button
-                    onClick={handleUpload}
-                    className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium"
-                  >
-                    Analyze Image
-                  </button>
-                </div>
+                {isAnalyzing ? (
+                  <div className="flex flex-col items-center justify-center py-8">
+                    <div className="relative w-16 h-16 mb-4">
+                      <div className="absolute inset-0 border-4 border-indigo-200 rounded-full"></div>
+                      <div className="absolute inset-0 border-4 border-indigo-600 rounded-full border-t-transparent animate-spin"></div>
+                    </div>
+                    <p className="text-lg font-medium text-indigo-600">Analyzing...</p>
+                    <p className="text-sm text-gray-500 mt-2">Please wait while we process your image</p>
+                  </div>
+                ) : (
+                  <div className="flex justify-center space-x-4">
+                    <button
+                      onClick={() => {
+                        setSelectedFile(null)
+                        setPreview(null)
+                      }}
+                      className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                    >
+                      Remove
+                    </button>
+                    <button
+                      onClick={handleUpload}
+                      className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium"
+                    >
+                      Analyze Image
+                    </button>
+                  </div>
+                )}
               </div>
             ) : (
               <>
