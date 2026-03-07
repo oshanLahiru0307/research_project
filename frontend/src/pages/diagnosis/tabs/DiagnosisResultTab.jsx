@@ -40,7 +40,13 @@ function DiagnosisResultTab({
           <div className="space-y-3">
             <div>
               <p className="text-xs text-gray-600 mb-1">Diagnosis</p>
-              <p className="text-lg font-bold text-gray-900">{aiAssessment.diagnosis}</p>
+              <p className={`text-lg font-bold ${
+                aiAssessment.diagnosis?.toLowerCase().includes('no') 
+                  ? 'text-green-600' 
+                  : 'text-red-600'
+              }`}>
+                {aiAssessment.diagnosis}
+              </p>
             </div>
             <div>
               <div className="flex justify-between items-center mb-1.5">

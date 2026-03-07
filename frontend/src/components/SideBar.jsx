@@ -26,19 +26,23 @@ function Sidebar({ sidebarOpen }) {
       submenu: [
         {
           name: 'Digestive',
+<<<<<<< HEAD
           path: '/diagnose/digestive/single',
 
         }, {
           name: 'Iris Analysis',
           path: '/iris/detection',
+=======
+          path: '/diagnose/digestive',
+>>>>>>> oshan
         },
         {
           name: 'Spinal',
-          path: '/diagnose/spinal/single',
+          path: '/diagnose/spinal',
         },
         {
           name: 'Liver',
-          path: '/diagnose/liver/single',
+          path: '/diagnose/liver',
         },
       ],
     },
