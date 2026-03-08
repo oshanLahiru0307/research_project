@@ -14,6 +14,7 @@ const createDiagnosis = async (req, res) => {
       prescribedMedicine,
       recommendedTests,
       clinicalNotes,
+      referralValidationReport,
     } = req.body;
 
     if (!disease || !diagnosis) {
@@ -83,6 +84,7 @@ const createDiagnosis = async (req, res) => {
       prescribedMedicine,
       recommendedTests,
       clinicalNotes,
+      referralValidationReport,
       createdBy: req.user?.id,
     });
 

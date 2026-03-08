@@ -1,10 +1,10 @@
 import { LinearProgress, Box } from '@mui/material'
 
-function DiagnosisResultTab({ 
-  image, 
-  aiAssessment, 
-  animatedConfidence, 
-  prescribedMedicine, 
+function DiagnosisResultTab({
+  image,
+  aiAssessment,
+  animatedConfidence,
+  prescribedMedicine,
   setPrescribedMedicine,
   recommendedTests,
   handleAddTest,
@@ -12,7 +12,7 @@ function DiagnosisResultTab({
   handleRemoveTest,
   clinicalNotes,
   setClinicalNotes,
-  handleSavePrescription 
+  handleSavePrescription
 }) {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 h-full">
@@ -20,7 +20,10 @@ function DiagnosisResultTab({
       <div className="flex flex-col gap-4 h-full overflow-hidden">
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 flex-1 flex flex-col min-h-0">
           <h3 className="text-base font-semibold text-gray-900 mb-3">Medical Scan Image</h3>
-          <div className="flex-1 rounded-lg overflow-hidden bg-gray-100 min-h-0">
+          <div className={`flex-1 rounded-lg overflow-hidden bg-gray-100 min-h-0 border-4 ${aiAssessment.diagnosis?.toLowerCase().includes('no')
+            ? 'border-green-500'
+            : 'border-red-500'
+            }`}>
             <img
               src={image}
               alt="Medical Scan"
@@ -30,21 +33,23 @@ function DiagnosisResultTab({
         </div>
 
         {/* AI Assessment */}
-        <div className="bg-pink-50 rounded-xl shadow-sm border border-pink-200 p-4 flex-shrink-0">
+        <div className={`rounded-xl shadow-sm border p-4 flex-shrink-0 transition-colors duration-300 ${aiAssessment.diagnosis?.toLowerCase().includes('no')
+          ? 'bg-green-50 border-green-200'
+          : 'bg-red-50 border-red-200'
+          }`}>
           <div className="flex items-center space-x-2 mb-3">
-            <svg className="w-5 h-5 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className={`w-5 h-5 ${aiAssessment.diagnosis?.toLowerCase().includes('no') ? 'text-green-600' : 'text-red-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
-            <h3 className="text-base font-semibold text-gray-900">AI Assessment</h3>
+            <h3 className="text-base font-semibold text-gray-900">Doctor Referral Validation</h3>
           </div>
           <div className="space-y-3">
             <div>
               <p className="text-xs text-gray-600 mb-1">Diagnosis</p>
-              <p className={`text-lg font-bold ${
-                aiAssessment.diagnosis?.toLowerCase().includes('no') 
-                  ? 'text-green-600' 
-                  : 'text-red-600'
-              }`}>
+              <p className={`text-lg font-bold ${aiAssessment.diagnosis?.toLowerCase().includes('no')
+                ? 'text-green-600'
+                : 'text-red-600'
+                }`}>
                 {aiAssessment.diagnosis}
               </p>
             </div>
@@ -63,15 +68,19 @@ function DiagnosisResultTab({
                     backgroundColor: '#e5e7eb',
                     '& .MuiLinearProgress-bar': {
                       borderRadius: '9999px',
-                      background: 'linear-gradient(90deg, #ef4444 0%, #dc2626 100%)',
+                      background: aiAssessment.diagnosis?.toLowerCase().includes('no')
+                        ? 'linear-gradient(90deg, #22c55e 0%, #16a34a 100%)'
+                        : 'linear-gradient(90deg, #ef4444 0%, #dc2626 100%)',
                       transition: 'transform 0.1s linear',
                     },
                   }}
                 />
               </Box>
             </div>
-            <div className="bg-white rounded-lg p-2.5 border border-pink-200">
-              <p className="text-xs text-gray-700">{aiAssessment.recommendation}</p>
+            <div className={`bg-white rounded-lg p-2.5 border ${aiAssessment.diagnosis?.toLowerCase().includes('no') ? 'border-green-200' : 'border-red-200'}`}>
+              <p className="text-xs text-gray-700 whitespace-pre-wrap">
+                {aiAssessment.validation_report || aiAssessment.recommendation}
+              </p>
             </div>
           </div>
         </div>
