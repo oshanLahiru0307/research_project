@@ -32,10 +32,9 @@ class DoctorValidationService:
                 genai.configure(api_key=self.api_key)
                 # Try both common names in case of version/region differences
                 try:
-                    self.model = genai.GenerativeModel('gemini-1.5-flash')
-                    # Test if it exists by dummy metadata access (optional)
+                    self.model = genai.GenerativeModel('models/gemini-1.5-flash')
                 except:
-                    self.model = genai.GenerativeModel('gemini-pro-vision') # older fallback
+                    self.model = genai.GenerativeModel('models/gemini-pro')
                 self.is_configured = True
                 logger.info("Validation model configured successfully.")
             except Exception as e:
@@ -109,11 +108,13 @@ Generate the report using exactly this format for a scan that is classified as '
             
             # List of model identifiers to try in order of preference
             models_to_try = [
+                'models/gemini-1.5-flash',
+                'models/gemini-1.5-flash-latest',
+                'models/gemini-1.5-flash-8b',
+                'models/gemini-2.0-flash-exp', # Newest experiment
+                'models/gemini-1.5-pro',
+                'models/gemini-pro',
                 'gemini-1.5-flash',
-                'gemini-1.5-flash-latest',
-                'gemini-1.5-flash-8b',
-                'gemini-1.5-pro',
-                'gemini-pro-vision', # Older legacy
                 'gemini-pro'
             ]
             
