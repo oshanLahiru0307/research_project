@@ -38,7 +38,7 @@ class DoctorValidationService:
                 self.is_configured = True
                 logger.info("Validation model configured successfully.")
             except Exception as e:
-                logger.error(f"Failed to configure Gemini: {e}")
+                logger.error(f"Failed to configure Doctor Validation Model: {e}")
                 self.is_configured = False
         else:
             self.is_configured = False
@@ -123,7 +123,7 @@ Generate the report using exactly this format for a scan that is classified as '
             
             for m_name in models_to_try:
                 try:
-                    logger.info(f"Trying Gemini model: {m_name}")
+                    logger.info(f"Trying Doctor Validation Model variant: {m_name}")
                     temp_model = genai.GenerativeModel(m_name)
                     # We need to recreate the generation call for each model attempt
                     response = temp_model.generate_content([prompt, img])

@@ -147,7 +147,7 @@ def predict_liver(image_array: np.ndarray, image_bytes: Optional[bytes] = None) 
             local_score=confidence,
             local_label=pred_class
         )
-        # Refine the final UI confidence score based on Gemini's visual assessment
+        # Refine the final UI confidence score based on Doctor Validation Model's visual assessment
         if "refined_score" in report_data:
             # Overwrite CNN confidence with refined "symptom-aware" confidence
             # Respect 95% maximum for ethical reasons

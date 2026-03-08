@@ -78,7 +78,7 @@ function DiagnosisResultTab({
               </Box>
             </div>
 
-            {/* AI Expert Observation (Gemini Report) */}
+            {/* AI Expert Observation (Doctor Validation Model Report) */}
             {aiAssessment.diagnosis?.toLowerCase().includes('liver') && (
               <div className="bg-indigo-50 rounded-xl shadow-sm border border-indigo-100 p-4 mt-2">
                 <div className="flex items-center space-x-2 mb-3">
