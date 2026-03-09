@@ -1,5 +1,9 @@
 {
+<<<<<<< HEAD
   "name": "research_frontend",
+=======
+  "name": "frontend",
+>>>>>>> f5b0f955c37f01e3e1e99a616408332d157a8f64
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -15,7 +19,10 @@
     "@mui/icons-material": "^7.3.6",
     "@mui/material": "^7.3.6",
     "@reduxjs/toolkit": "^2.5.0",
+<<<<<<< HEAD
     "@supabase/supabase-js": "^2.98.0",
+=======
+>>>>>>> f5b0f955c37f01e3e1e99a616408332d157a8f64
     "axios": "^1.13.6",
     "framer-motion": "^12.23.26",
     "html2canvas": "^1.4.1",

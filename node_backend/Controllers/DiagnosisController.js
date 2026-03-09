@@ -14,6 +14,10 @@ const createDiagnosis = async (req, res) => {
       prescribedMedicine,
       recommendedTests,
       clinicalNotes,
+<<<<<<< HEAD
+=======
+      referralValidationReport,
+>>>>>>> f5b0f955c37f01e3e1e99a616408332d157a8f64
     } = req.body;
 
     if (!disease || !diagnosis) {
@@ -83,6 +87,10 @@ const createDiagnosis = async (req, res) => {
       prescribedMedicine,
       recommendedTests,
       clinicalNotes,
+<<<<<<< HEAD
+=======
+      referralValidationReport,
+>>>>>>> f5b0f955c37f01e3e1e99a616408332d157a8f64
       createdBy: req.user?.id,
     });
 

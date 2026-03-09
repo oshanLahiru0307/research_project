@@ -53,6 +53,7 @@ export const createDiagnosisThunk = createAsyncThunk(
   }
 )
 
+<<<<<<< HEAD
 export const deleteDiagnosisThunk = createAsyncThunk(
   'diagnoses/delete',
   async (id, { rejectWithValue }) => {
@@ -65,6 +66,8 @@ export const deleteDiagnosisThunk = createAsyncThunk(
   }
 )
 
+=======
+>>>>>>> f5b0f955c37f01e3e1e99a616408332d157a8f64
 const diagnosesSlice = createSlice({
   name: 'diagnoses',
   initialState: {
@@ -93,6 +96,7 @@ const diagnosesSlice = createSlice({
       .addCase(createDiagnosisThunk.rejected, (state, action) => {
         state.error = action.payload
       })
+<<<<<<< HEAD
       .addCase(deleteDiagnosisThunk.fulfilled, (state, action) => {
         const id = action.payload
         state.items = state.items.filter((d) => d?._id !== id && d?.id !== id)
@@ -100,6 +104,8 @@ const diagnosesSlice = createSlice({
       .addCase(deleteDiagnosisThunk.rejected, (state, action) => {
         state.error = action.payload
       })
+=======
+>>>>>>> f5b0f955c37f01e3e1e99a616408332d157a8f64
   },
 })
 

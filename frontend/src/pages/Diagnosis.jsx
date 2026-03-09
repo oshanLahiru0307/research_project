@@ -40,6 +40,7 @@ function DiagnosisOverview() {
       severity: 'low',
       icon: '🔬',
     },
+<<<<<<< HEAD
     {
       name: 'Health Check',
       path: '/diagnose/health-check',
@@ -48,6 +49,8 @@ function DiagnosisOverview() {
       severity: 'low',
       icon: '✅',
     },
+=======
+>>>>>>> f5b0f955c37f01e3e1e99a616408332d157a8f64
   ]
 
   return (

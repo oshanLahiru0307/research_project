@@ -25,6 +25,7 @@ export const createPatientThunk = createAsyncThunk(
   }
 )
 
+<<<<<<< HEAD
 export const updatePatientThunk = createAsyncThunk(
   'patients/update',
   async ({ id, updates }, { rejectWithValue }) => {
@@ -37,6 +38,8 @@ export const updatePatientThunk = createAsyncThunk(
   }
 )
 
+=======
+>>>>>>> f5b0f955c37f01e3e1e99a616408332d157a8f64
 const patientsSlice = createSlice({
   name: 'patients',
   initialState: {
@@ -65,6 +68,7 @@ const patientsSlice = createSlice({
       .addCase(createPatientThunk.rejected, (state, action) => {
         state.error = action.payload
       })
+<<<<<<< HEAD
       .addCase(updatePatientThunk.fulfilled, (state, action) => {
         const updated = action.payload
         const idx = state.items.findIndex((p) => p?._id === updated?._id)
@@ -75,6 +79,8 @@ const patientsSlice = createSlice({
       .addCase(updatePatientThunk.rejected, (state, action) => {
         state.error = action.payload
       })
+=======
+>>>>>>> f5b0f955c37f01e3e1e99a616408332d157a8f64
   },
 })
 
