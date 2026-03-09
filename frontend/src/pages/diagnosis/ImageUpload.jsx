@@ -1,6 +1,10 @@
 import { useState } from 'react'
 import { useNavigate, useParams, useLocation } from 'react-router-dom'
 import { predictDigestive } from '../../api/digestiveApi'
+<<<<<<< HEAD
+=======
+import { predictLiver } from '../../api/liverApi'
+>>>>>>> f5b0f955c37f01e3e1e99a616408332d157a8f64
 
 function ImageUpload() {
   const navigate = useNavigate()
@@ -18,7 +22,10 @@ function ImageUpload() {
     digestive: 'Digestive',
     spinal: 'Spinal',
     liver: 'Liver',
+<<<<<<< HEAD
     'health-check': 'Health Check',
+=======
+>>>>>>> f5b0f955c37f01e3e1e99a616408332d157a8f64
   }
 
   const diseaseName = diseaseNames[disease] || 'Medical Condition'
@@ -67,6 +74,7 @@ function ImageUpload() {
     setIsAnalyzing(true)
 
     try {
+<<<<<<< HEAD
       if (disease === 'digestive' || disease === 'health-check') {
         const apiResult = await predictDigestive(selectedFile)
         navigate(`/diagnose/${disease}/upload/results`, {
@@ -91,6 +99,25 @@ function ImageUpload() {
           },
         })
       }
+=======
+      let apiResult = null
+      if (disease === 'digestive') {
+        apiResult = await predictDigestive(selectedFile)
+      } else if (disease === 'liver') {
+        apiResult = await predictLiver(selectedFile)
+      }
+
+      navigate(`/diagnose/${disease}/upload/results`, {
+        state: {
+          image: preview,
+          fileName: selectedFile.name,
+          aiResult: apiResult,
+          patient,
+          eye: selectedEye,
+          file: selectedFile,
+        },
+      })
+>>>>>>> f5b0f955c37f01e3e1e99a616408332d157a8f64
     } catch (err) {
       const msg = err?.response?.data?.error || err?.message || 'Analysis failed'
       alert(msg)
@@ -127,11 +154,18 @@ function ImageUpload() {
             onDragLeave={handleDrag}
             onDragOver={handleDrag}
             onDrop={handleDrop}
+<<<<<<< HEAD
             className={`border-2 border-dashed rounded-xl p-12 transition-colors ${
               dragActive
                 ? 'border-indigo-500 bg-indigo-50'
                 : 'border-gray-300 hover:border-indigo-400'
             }`}
+=======
+            className={`border-2 border-dashed rounded-xl p-12 transition-colors ${dragActive
+              ? 'border-indigo-500 bg-indigo-50'
+              : 'border-gray-300 hover:border-indigo-400'
+              }`}
+>>>>>>> f5b0f955c37f01e3e1e99a616408332d157a8f64
           >
             {preview ? (
               <div className="space-y-4">

@@ -26,7 +26,15 @@ function Sidebar({ sidebarOpen }) {
       submenu: [
         {
           name: 'Digestive',
+<<<<<<< HEAD
           path: '/diagnose/digestive',
+=======
+          path: '/diagnose/digestive/single',
+
+        }, {
+          name: 'Iris Analysis',
+          path: '/iris/detection',
+>>>>>>> f5b0f955c37f01e3e1e99a616408332d157a8f64
         },
         {
           name: 'Spinal',
@@ -36,10 +44,13 @@ function Sidebar({ sidebarOpen }) {
           name: 'Liver',
           path: '/diagnose/liver',
         },
+<<<<<<< HEAD
         {
           name: 'Health Check',
           path: '/diagnose/health-check',
         },
+=======
+>>>>>>> f5b0f955c37f01e3e1e99a616408332d157a8f64
       ],
     },
     {
@@ -142,4 +153,7 @@ function Sidebar({ sidebarOpen }) {
 }
 
 export default Sidebar
+<<<<<<< HEAD
 
+=======
+>>>>>>> f5b0f955c37f01e3e1e99a616408332d157a8f64

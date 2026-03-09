@@ -52,6 +52,13 @@ const diagnosisSchema = new Schema(
       type: String,
       trim: true,
     },
+<<<<<<< HEAD
+=======
+    referralValidationReport: {
+      type: String,
+      trim: true,
+    },
+>>>>>>> f5b0f955c37f01e3e1e99a616408332d157a8f64
     createdBy: {
       type: Schema.Types.ObjectId,
       ref: 'User',

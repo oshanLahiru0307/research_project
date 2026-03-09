@@ -1,8 +1,13 @@
 {
   "name": "node_backend",
   "version": "1.0.0",
+<<<<<<< HEAD
   "description": "",
   "main": "server.js",
+=======
+  "description": "This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.",
+  "main": "index.js",
+>>>>>>> f5b0f955c37f01e3e1e99a616408332d157a8f64
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon server.js"
@@ -18,7 +23,10 @@
     "express": "^5.2.1",
     "helmet": "^8.0.0",
     "jsonwebtoken": "^9.0.2",
+<<<<<<< HEAD
     "mongoos": "^0.0.1-security",
+=======
+>>>>>>> f5b0f955c37f01e3e1e99a616408332d157a8f64
     "mongoose": "^9.2.2",
     "multer": "^2.1.1",
     "uuid": "^13.0.0"

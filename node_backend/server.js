@@ -45,7 +45,15 @@ app.use((err, req, res, next) => {
 const port = process.env.PORT || 5000;
 
 mongoose
+<<<<<<< HEAD
   .connect(process.env.MONGO_URI)
+=======
+  .connect(process.env.MONGO_URI, {
+    serverSelectionTimeoutMS: 10000, // Wait 10s for server selection
+    connectTimeoutMS: 10000, // Wait 10s for initial connection
+    socketTimeoutMS: 45000, // Close sockets after 45s of inactivity
+  })
+>>>>>>> f5b0f955c37f01e3e1e99a616408332d157a8f64
   .then(() => {
     console.log('Connected to MongoDB');
     app.listen(port, () => {
@@ -53,6 +61,22 @@ mongoose
     });
   })
   .catch((err) => {
+<<<<<<< HEAD
     console.log(err);
   });
 
+=======
+    console.error('Mongoose initial connection error:', err);
+  });
+
+// Handle connection events after initial connect
+mongoose.connection.on('error', (err) => {
+  console.error('MongoDB runtime error:', err);
+});
+
+mongoose.connection.on('disconnected', () => {
+  console.warn('MongoDB disconnected. Attempting to reconnect...');
+});
+
+
+>>>>>>> f5b0f955c37f01e3e1e99a616408332d157a8f64

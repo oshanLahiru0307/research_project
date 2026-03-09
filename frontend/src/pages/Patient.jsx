@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+<<<<<<< HEAD
 import { useNavigate } from 'react-router-dom'
 import { fetchPatientsThunk, createPatientThunk, updatePatientThunk } from '../state/patientsSlice'
 
@@ -15,6 +16,14 @@ function Patient() {
   const [searchQuery, setSearchQuery] = useState('')
   const [conditionFilter, setConditionFilter] = useState('All')
   const [statusFilter, setStatusFilter] = useState('All')
+=======
+import { fetchPatientsThunk, createPatientThunk } from '../state/patientsSlice'
+
+function Patient() {
+  const dispatch = useDispatch()
+  const { items: patients, status, error } = useSelector((state) => state.patients)
+  const [showAddForm, setShowAddForm] = useState(false)
+>>>>>>> f5b0f955c37f01e3e1e99a616408332d157a8f64
   const [newPatient, setNewPatient] = useState({
     firstName: '',
     lastName: '',
@@ -76,6 +85,7 @@ function Patient() {
     })
   }
 
+<<<<<<< HEAD
   const formatDate = (d) => {
     if (!d) return 'N/A'
     try {
@@ -149,6 +159,8 @@ function Patient() {
     return matchesQuery && matchesCondition && matchesStatus
   })
 
+=======
+>>>>>>> f5b0f955c37f01e3e1e99a616408332d157a8f64
   return (
     <div className="space-y-6">
       {/* Page Header */}
@@ -158,10 +170,14 @@ function Patient() {
           <p className="text-gray-600 mt-1">View and manage all patient records</p>
         </div>
         <button
+<<<<<<< HEAD
           onClick={() => {
             closePanel()
             setShowAddForm((prev) => !prev)
           }}
+=======
+          onClick={() => setShowAddForm((prev) => !prev)}
+>>>>>>> f5b0f955c37f01e3e1e99a616408332d157a8f64
           className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl"
         >
           + Add New Patient
@@ -297,6 +313,7 @@ function Patient() {
         </div>
       )}
 
+<<<<<<< HEAD
       {/* Patient Details / Edit Panels */}
       {activePanel !== 'list' && (
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
@@ -444,18 +461,24 @@ function Patient() {
         </div>
       )}
 
+=======
+>>>>>>> f5b0f955c37f01e3e1e99a616408332d157a8f64
       {/* Search and Filter */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1">
             <input
               type="text"
+<<<<<<< HEAD
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+=======
+>>>>>>> f5b0f955c37f01e3e1e99a616408332d157a8f64
               placeholder="Search patients by name, email, or phone..."
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
             />
           </div>
+<<<<<<< HEAD
           <select
             value={conditionFilter}
             onChange={(e) => setConditionFilter(e.target.value)}
@@ -476,10 +499,25 @@ function Patient() {
             <option value="Monitoring">Monitoring</option>
             <option value="Scheduled">Scheduled</option>
             <option value="Critical">Critical</option>
+=======
+          <select className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none">
+            <option>All Conditions</option>
+            <option>Digestive</option>
+            <option>Spinal</option>
+            <option>Liver</option>
+          </select>
+          <select className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none">
+            <option>All Status</option>
+            <option>Active</option>
+            <option>Monitoring</option>
+            <option>Scheduled</option>
+            <option>Critical</option>
+>>>>>>> f5b0f955c37f01e3e1e99a616408332d157a8f64
           </select>
         </div>
       </div>
 
+<<<<<<< HEAD
       {/* Patient Table */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
@@ -564,6 +602,99 @@ function Patient() {
             </tbody>
           </table>
         </div>
+=======
+      {/* Patient Cards Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {status === 'loading' && patients.length === 0 && (
+          <p className="text-gray-500 text-sm">Loading patients...</p>
+        )}
+        {status === 'succeeded' && patients.length === 0 && (
+          <p className="text-gray-500 text-sm">No patients found. Add a new patient to get started.</p>
+        )}
+        {patients.map((patient) => {
+          const name = `${patient.firstName || ''} ${patient.lastName || ''}`.trim() || 'Unnamed Patient'
+          const initials = name
+            .split(' ')
+            .filter(Boolean)
+            .map((n) => n[0])
+            .join('')
+          const lastVisit = patient.lastVisit
+            ? new Date(patient.lastVisit).toISOString().split('T')[0]
+            : 'N/A'
+          const nextAppointment = patient.nextAppointment
+            ? new Date(patient.nextAppointment).toISOString().split('T')[0]
+            : 'N/A'
+
+          return (
+          <div key={patient._id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+            <div className="flex items-start justify-between mb-4">
+              <div className="flex items-center space-x-3">
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-purple-600 rounded-full flex items-center justify-center">
+                  <span className="text-white font-semibold text-lg">
+                    {initials || '?'}
+                  </span>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900">{name}</h3>
+                  {patient.dateOfBirth && (
+                    <p className="text-sm text-gray-500">
+                      DOB: {new Date(patient.dateOfBirth).toISOString().split('T')[0]}
+                    </p>
+                  )}
+                </div>
+              </div>
+              <span className={`px-3 py-1 text-xs font-semibold rounded-full ${
+                patient.status === 'Active' ? 'bg-blue-100 text-blue-800' :
+                patient.status === 'Monitoring' ? 'bg-yellow-100 text-yellow-800' :
+                patient.status === 'Scheduled' ? 'bg-purple-100 text-purple-800' :
+                'bg-red-100 text-red-800'
+              }`}>
+                {patient.status}
+              </span>
+            </div>
+
+            <div className="space-y-2 mb-4">
+              <div className="flex items-center text-sm text-gray-600">
+                <svg className="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+                {patient.email || 'No email'}
+              </div>
+              <div className="flex items-center text-sm text-gray-600">
+                <svg className="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                </svg>
+                {patient.phone || 'No phone'}
+              </div>
+              <div className="flex items-center text-sm text-gray-600">
+                <svg className="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+                {patient.condition || 'No condition'}
+              </div>
+            </div>
+
+            <div className="pt-4 border-t border-gray-200">
+              <div className="flex justify-between text-sm mb-3">
+                <span className="text-gray-500">Last Visit:</span>
+                <span className="font-medium text-gray-900">{lastVisit}</span>
+              </div>
+              <div className="flex justify-between text-sm mb-4">
+                <span className="text-gray-500">Next Appointment:</span>
+                <span className="font-medium text-blue-600">{nextAppointment}</span>
+              </div>
+              <div className="flex space-x-2">
+                <button className="flex-1 bg-blue-50 text-blue-600 py-2 px-4 rounded-lg font-medium hover:bg-blue-100 transition-colors">
+                  View Details
+                </button>
+                <button className="flex-1 bg-gray-50 text-gray-600 py-2 px-4 rounded-lg font-medium hover:bg-gray-100 transition-colors">
+                  Edit
+                </button>
+              </div>
+            </div>
+          </div>
+        )})}
+>>>>>>> f5b0f955c37f01e3e1e99a616408332d157a8f64
       </div>
     </div>
   )
