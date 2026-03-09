@@ -25,6 +25,18 @@ export const createPatientThunk = createAsyncThunk(
   }
 )
 
+export const updatePatientThunk = createAsyncThunk(
+  'patients/update',
+  async ({ id, updates }, { rejectWithValue }) => {
+    try {
+      const res = await API.put(`/patients/${id}`, updates)
+      return res.data
+    } catch (err) {
+      return rejectWithValue(err?.response?.data?.message || err.message || 'Failed to update patient')
+    }
+  }
+)
+
 const patientsSlice = createSlice({
   name: 'patients',
   initialState: {
@@ -51,6 +63,16 @@ const patientsSlice = createSlice({
         state.items.unshift(action.payload)
       })
       .addCase(createPatientThunk.rejected, (state, action) => {
+        state.error = action.payload
+      })
+      .addCase(updatePatientThunk.fulfilled, (state, action) => {
+        const updated = action.payload
+        const idx = state.items.findIndex((p) => p?._id === updated?._id)
+        if (idx !== -1) {
+          state.items[idx] = updated
+        }
+      })
+      .addCase(updatePatientThunk.rejected, (state, action) => {
         state.error = action.payload
       })
   },
