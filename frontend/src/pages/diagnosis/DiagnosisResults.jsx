@@ -6,6 +6,7 @@ import DiagnosisResultTab from './tabs/DiagnosisResultTab'
 import PatientInfoTab from './tabs/PatientInfoTab'
 import MedicalHistoryTab from './tabs/MedicalHistoryTab'
 import PastDiagnosesTab from './tabs/PastDiagnosesTab'
+import LiverExpertAnalysisTab from './tabs/LiverExpertAnalysisTab'
 import ConfirmationModal from '../../components/ConfirmationModal'
 import SuccessMessage from '../../components/SuccessMessage'
 import PatientReportPDF from '../../components/PatientReportPDF'
@@ -40,7 +41,7 @@ function DiagnosisResults() {
   // Function to get disease-specific diagnosis
   const getDiseaseDiagnosis = (diseaseType) => {
     const diseaseLower = diseaseType?.toLowerCase() || ''
-    
+
     const diagnosisMap = {
       'dr': 'PDR', // Proliferative Diabetic Retinopathy
       'amd': 'No AMD', // Age-related Macular Degeneration
@@ -48,10 +49,9 @@ function DiagnosisResults() {
       'glaucoma': 'No Glaucoma',
       'digestive': 'Digestive',
       'spinal': 'Spinal',
-      'liver': 'Liver',
-      'health-check': 'Health Check',
+      'liver': 'Liver'
     }
-    
+
     // If not in map, capitalize first letter of disease name
     if (diagnosisMap[diseaseLower]) {
       return diagnosisMap[diseaseLower]
@@ -59,7 +59,7 @@ function DiagnosisResults() {
       // Capitalize first letter and return disease name
       return diseaseType.charAt(0).toUpperCase() + diseaseType.slice(1).toLowerCase()
     }
-    
+
     return 'No Diagnosis'
   }
 
@@ -67,7 +67,7 @@ function DiagnosisResults() {
   const getDiseaseRecommendation = (diseaseType, diagnosis) => {
     const diseaseLower = diseaseType?.toLowerCase() || ''
     const isNegative = diagnosis?.toLowerCase().includes('no')
-    
+
     if (isNegative) {
       const recommendations = {
         'dr': 'No signs of diabetic retinopathy detected. Continue regular monitoring.',
@@ -76,7 +76,7 @@ function DiagnosisResults() {
         'glaucoma': 'No signs of glaucoma detected. Regular eye pressure monitoring recommended.',
         'digestive': 'Digestive system assessment completed. Continue regular monitoring and follow-up as needed.',
         'spinal': 'Spinal condition assessment completed. Continue regular monitoring and follow-up as needed.',
-        'liver': 'Liver function assessment completed. Continue regular monitoring and follow-up as needed.',
+        'liver': 'Liver function assessment completed. Continue regular monitoring and follow-up as needed.'
       }
       return recommendations[diseaseLower] || 'Assessment completed. Continue regular monitoring and follow-up as needed.'
     } else {
@@ -87,7 +87,7 @@ function DiagnosisResults() {
         'glaucoma': 'Glaucoma signs detected. Immediate specialist consultation and treatment required.',
         'digestive': 'Digestive system abnormalities detected. Specialist consultation recommended.',
         'spinal': 'Spinal abnormalities detected. Immediate specialist consultation recommended.',
-        'liver': 'Liver function abnormalities detected. Specialist consultation and further evaluation required.',
+        'liver': 'Liver function abnormalities detected. Specialist consultation and further evaluation required.'
       }
       return recommendations[diseaseLower] || 'Abnormalities detected. Specialist consultation recommended.'
     }
@@ -112,20 +112,25 @@ function DiagnosisResults() {
         probabilities: aiResult.probabilities,
       }
     }
-    if (disease === 'health-check' && aiResult) {
-      const pred = (aiResult.prediction || '').toLowerCase()
+
+    if (disease === 'liver' && aiResult) {
+      const pred = aiResult.prediction
+      const status = aiResult.status // 'issue_detected' or 'no_issue'
       const conf = aiResult.confidence ?? 0
+      // Our backend now returns percentage directly (0-100) or 0-1
       const confPercent = typeof conf === 'number' && conf <= 1 ? conf * 100 : conf
-      const isHealthy = pred === 'normal' || pred.includes('normal')
-      const diagnosisLabel = isHealthy ? 'Healthy' : 'Not healthy'
-      const recommendation = isHealthy
-        ? 'Image appears healthy. Continue routine monitoring as needed.'
-        : 'Potential abnormality detected. Specialist consultation recommended.'
+
+      const diagnosisLabel = status === 'issue_detected' ? 'Liver Issue Detected' : 'No Liver Issues Detected'
+      const recommendation =
+        status === 'no_issue'
+          ? 'No signs of liver abnormality detected. Continue regular monitoring and follow-up as needed.'
+          : 'Liver function abnormalities detected. Specialist consultation and further evaluation required.'
 
       return {
         diagnosis: diagnosisLabel,
         confidence: confPercent,
         recommendation,
+        validation_report: aiResult.validation_report,
         probabilities: aiResult.probabilities,
       }
     }
@@ -157,15 +162,15 @@ function DiagnosisResults() {
         // Animate from 0 to target value over 2 seconds
         const duration = 2000 // 2 seconds
         const startTime = Date.now()
-        
+
         const animate = () => {
           const elapsed = Date.now() - startTime
           const progress = Math.min(elapsed / duration, 1)
-          
+
           // Ease-out animation function
           const easeOut = 1 - Math.pow(1 - progress, 3)
           setAnimatedConfidence(easeOut * confidenceValue)
-          
+
           if (progress < 1) {
             animationRef.current = requestAnimationFrame(animate)
           } else {
@@ -173,7 +178,7 @@ function DiagnosisResults() {
             hasAnimatedRef.current = true
           }
         }
-        
+
         animationRef.current = requestAnimationFrame(animate)
       }, 100)
 
@@ -219,7 +224,7 @@ function DiagnosisResults() {
 
       // Clone the content to avoid modifying the original
       const content = previewElement.cloneNode(true)
-      
+
       // Get all styles from the document
       const styles = Array.from(document.styleSheets)
         .map(sheet => {
@@ -232,7 +237,7 @@ function DiagnosisResults() {
           }
         })
         .join('\n')
-      
+
       printWindow.document.write(`
         <!DOCTYPE html>
         <html>
@@ -266,7 +271,7 @@ function DiagnosisResults() {
         </html>
       `)
       printWindow.document.close()
-      
+
       // Wait for content to load, then print
       setTimeout(() => {
         printWindow.print()
@@ -281,10 +286,10 @@ function DiagnosisResults() {
     try {
       // Show the PDF report component
       setShowPDFReport(true)
-      
+
       // Wait a bit for the component to render
       await new Promise(resolve => setTimeout(resolve, 500))
-      
+
       // Get the report element
       const reportElement = pdfReportRef.current
       if (!reportElement) {
@@ -302,7 +307,7 @@ function DiagnosisResults() {
       })
 
       const imgData = canvas.toDataURL('image/png')
-      
+
       // Calculate PDF dimensions
       const imgWidth = 210 // A4 width in mm
       const pageHeight = 297 // A4 height in mm
@@ -331,7 +336,7 @@ function DiagnosisResults() {
 
       // Save PDF
       pdf.save(filename)
-      
+
       // Hide the PDF report component and preview
       setShowPDFReport(false)
       setShowPDFPreview(false)
@@ -378,8 +383,9 @@ function DiagnosisResults() {
         prescribedMedicine,
         recommendedTests: recommendedTests.filter((test) => test.trim() !== ''),
         clinicalNotes,
+        referralValidationReport: aiResult?.validation_report,
         imageFile,
-        patientId: patient?._id || patient?.id,
+        patientId: patient?.id,
       }
 
       const resultAction = await dispatch(createDiagnosisThunk(payload))
@@ -394,13 +400,16 @@ function DiagnosisResults() {
       setIsSaving(false)
     }
   }
-
   const tabs = [
     { id: 'results', name: 'Diagnosis Results', icon: '📊' },
     { id: 'patient', name: 'Patient Info', icon: '👤' },
     { id: 'history', name: 'Medical History', icon: '📋' },
     { id: 'past', name: 'Past Diagnoses', icon: '📄' },
   ]
+
+  if (disease === 'liver') {
+    tabs.push({ id: 'liver_expert', name: 'Expert Analysis', icon: '🔍' })
+  }
 
   return (
     <div className="flex flex-col h-[calc(100vh-8rem)]">
@@ -433,12 +442,12 @@ function DiagnosisResults() {
           {tabs.map((tab) => (
             <button
               key={tab.id}
+              data-tab-id={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center space-x-2 py-3 px-1 border-b-2 font-medium text-sm transition-colors ${
-                activeTab === tab.id
-                  ? 'border-indigo-600 text-indigo-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
+              className={`flex items-center space-x-2 py-3 px-1 border-b-2 font-medium text-sm transition-colors ${activeTab === tab.id
+                ? 'border-indigo-600 text-indigo-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
             >
               <span>{tab.icon}</span>
               <span>{tab.name}</span>
@@ -471,6 +480,10 @@ function DiagnosisResults() {
         {activeTab === 'history' && <MedicalHistoryTab patient={patient} />}
 
         {activeTab === 'past' && <PastDiagnosesTab />}
+
+        {activeTab === 'liver_expert' && disease === 'liver' && (
+          <LiverExpertAnalysisTab aiAssessment={aiAssessment} />
+        )}
       </div>
 
       {/* Confirmation Modal */}

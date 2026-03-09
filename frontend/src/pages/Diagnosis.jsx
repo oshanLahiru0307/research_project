@@ -40,14 +40,6 @@ function DiagnosisOverview() {
       severity: 'low',
       icon: '🔬',
     },
-    {
-      name: 'Health Check',
-      path: '/diagnose/health-check',
-      description: 'Quick check to identify whether an image looks healthy or abnormal',
-      count: 0,
-      severity: 'low',
-      icon: '✅',
-    },
   ]
 
   return (

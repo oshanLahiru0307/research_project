@@ -15,8 +15,3 @@ export async function predictDigestive(imageFile) {
   return data
 }
 
-export async function getDigestiveHealth() {
-  const { data } = await ML_API.get('/digestive/health')
-  return data
-}
-
