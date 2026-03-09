@@ -42,8 +42,9 @@ def _decode_and_resize(image_bytes: bytes) -> np.ndarray:
 def preprocess_liver_image(image_bytes: bytes) -> np.ndarray:
     """
     Preprocess image for liver model input.
-    Uses standard [0, 1] normalization.
+    Uses EfficientNetV2 preprocessing.
     """
+    import tensorflow as tf
     from PIL import Image
     import io
 
@@ -51,8 +52,10 @@ def preprocess_liver_image(image_bytes: bytes) -> np.ndarray:
     pil_image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
     pil_image = pil_image.resize((liver_config.IMG_SIZE, liver_config.IMG_SIZE), Image.LANCZOS)
     
-    # Scale pixels - removed / 255.0 to see if it matches model expectation
     img_array = np.array(pil_image, dtype=np.float32)
+    # Apply EfficientNetV2 preprocessing
+    img_array = tf.keras.applications.efficientnet_v2.preprocess_input(img_array)
+    
     print(f"DEBUG: Liver Preprocess - Shape: {img_array.shape}, Mean: {np.mean(img_array):.2f}")
     img = np.expand_dims(img_array, axis=0)
     return img

@@ -6,6 +6,7 @@ import DiagnosisResultTab from './tabs/DiagnosisResultTab'
 import PatientInfoTab from './tabs/PatientInfoTab'
 import MedicalHistoryTab from './tabs/MedicalHistoryTab'
 import PastDiagnosesTab from './tabs/PastDiagnosesTab'
+import LiverExpertAnalysisTab from './tabs/LiverExpertAnalysisTab'
 import ConfirmationModal from '../../components/ConfirmationModal'
 import SuccessMessage from '../../components/SuccessMessage'
 import PatientReportPDF from '../../components/PatientReportPDF'
@@ -399,13 +400,16 @@ function DiagnosisResults() {
       setIsSaving(false)
     }
   }
-
   const tabs = [
     { id: 'results', name: 'Diagnosis Results', icon: '📊' },
     { id: 'patient', name: 'Patient Info', icon: '👤' },
     { id: 'history', name: 'Medical History', icon: '📋' },
     { id: 'past', name: 'Past Diagnoses', icon: '📄' },
   ]
+
+  if (disease === 'liver') {
+    tabs.push({ id: 'liver_expert', name: 'Expert Analysis', icon: '🔍' })
+  }
 
   return (
     <div className="flex flex-col h-[calc(100vh-8rem)]">
@@ -438,6 +442,7 @@ function DiagnosisResults() {
           {tabs.map((tab) => (
             <button
               key={tab.id}
+              data-tab-id={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center space-x-2 py-3 px-1 border-b-2 font-medium text-sm transition-colors ${activeTab === tab.id
                 ? 'border-indigo-600 text-indigo-600'
@@ -475,6 +480,10 @@ function DiagnosisResults() {
         {activeTab === 'history' && <MedicalHistoryTab patient={patient} />}
 
         {activeTab === 'past' && <PastDiagnosesTab />}
+
+        {activeTab === 'liver_expert' && disease === 'liver' && (
+          <LiverExpertAnalysisTab aiAssessment={aiAssessment} />
+        )}
       </div>
 
       {/* Confirmation Modal */}

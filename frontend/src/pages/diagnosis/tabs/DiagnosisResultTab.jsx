@@ -78,30 +78,31 @@ function DiagnosisResultTab({
               </Box>
             </div>
 
-            {/* AI Expert Observation (Doctor Validation Model Report) */}
+            {/* AI Expert Observation (Doctor Validation Model Report) - Simplified Summary for Results Tab */}
             {aiAssessment.diagnosis?.toLowerCase().includes('liver') && (
-              <div className="bg-indigo-50 rounded-xl shadow-sm border border-indigo-100 p-4 mt-2">
-                <div className="flex items-center space-x-2 mb-3">
-                  <div className="bg-indigo-600 p-1.5 rounded-lg">
-                    <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                    </svg>
-                  </div>
-                  <h3 className="text-sm font-bold text-gray-900 uppercase tracking-tight">AI Expert Observation</h3>
-                </div>
-                <div className="bg-white rounded-lg p-3 border border-indigo-100 shadow-inner">
-                  {aiAssessment.validation_report ? (
-                    <p className="text-xs text-slate-700 leading-relaxed whitespace-pre-wrap font-medium">
-                      {aiAssessment.validation_report}
-                    </p>
-                  ) : (
-                    <div className="flex flex-col items-center py-4 text-gray-400">
-                      <svg className="w-8 h-8 mb-2 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              <div className="bg-indigo-50 rounded-xl shadow-sm border border-indigo-200 p-4 mt-2">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center space-x-2">
+                    <div className="bg-indigo-600 p-1.5 rounded-lg shadow-sm">
+                      <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                       </svg>
-                      <p className="text-[10px] italic">Generating specialized visual insights...</p>
                     </div>
-                  )}
+                    <h3 className="text-sm font-bold text-indigo-900 uppercase tracking-tight">Expert Pathology Insight</h3>
+                  </div>
+                  <button
+                    onClick={() => document.querySelector('[data-tab-id="liver_expert"]')?.click()}
+                    className="text-[10px] bg-white text-indigo-600 px-3 py-1.5 rounded-md border border-indigo-200 font-black hover:bg-indigo-50 transition-all shadow-sm active:scale-95"
+                  >
+                    VIEW FULL BREAKDOWN
+                  </button>
+                </div>
+                <div className="bg-white/60 rounded-lg p-3 border border-indigo-100 italic">
+                  <p className="text-[11px] text-indigo-800 leading-snug font-medium">
+                    {aiAssessment.validation_report
+                      ? "Advanced pathology patterns and symptoms have been identified for this liver scan. Click above to view the structured expert visual analysis."
+                      : "Generating specialized visual insights based on identified liver pathology patterns..."}
+                  </p>
                 </div>
               </div>
             )}

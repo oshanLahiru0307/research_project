@@ -12,7 +12,7 @@ CLASSES = ['liver', 'normal']
 
 MODEL_PATH = os.environ.get(
     'LIVER_MODEL_PATH',
-    str(BASE_DIR / 'models' / 'digestive' / 'final_hybrid_liver_model.keras')
+    str(BASE_DIR / 'models' / 'liver' / 'final_hybrid_liver_model.keras')
 )
 
 # Flask (Reusing same settings or can be specific)
