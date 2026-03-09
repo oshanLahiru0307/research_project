@@ -41,7 +41,9 @@ function DiagnosisResultTab({
             <div>
               <p className="text-xs text-gray-600 mb-1">Diagnosis</p>
               <p className={`text-lg font-bold ${
-                aiAssessment.diagnosis?.toLowerCase().includes('no') 
+                aiAssessment.diagnosis?.toLowerCase().includes('no') ||
+                aiAssessment.diagnosis?.toLowerCase().includes('healthy') ||
+                aiAssessment.diagnosis?.toLowerCase().includes('normal')
                   ? 'text-green-600' 
                   : 'text-red-600'
               }`}>
