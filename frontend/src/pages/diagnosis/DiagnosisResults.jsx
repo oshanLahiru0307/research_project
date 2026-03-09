@@ -48,7 +48,8 @@ function DiagnosisResults() {
       'glaucoma': 'No Glaucoma',
       'digestive': 'Digestive',
       'spinal': 'Spinal',
-      'liver': 'Liver'
+      'liver': 'Liver',
+      'health-check': 'Health Check',
     }
     
     // If not in map, capitalize first letter of disease name
@@ -75,7 +76,7 @@ function DiagnosisResults() {
         'glaucoma': 'No signs of glaucoma detected. Regular eye pressure monitoring recommended.',
         'digestive': 'Digestive system assessment completed. Continue regular monitoring and follow-up as needed.',
         'spinal': 'Spinal condition assessment completed. Continue regular monitoring and follow-up as needed.',
-        'liver': 'Liver function assessment completed. Continue regular monitoring and follow-up as needed.'
+        'liver': 'Liver function assessment completed. Continue regular monitoring and follow-up as needed.',
       }
       return recommendations[diseaseLower] || 'Assessment completed. Continue regular monitoring and follow-up as needed.'
     } else {
@@ -86,7 +87,7 @@ function DiagnosisResults() {
         'glaucoma': 'Glaucoma signs detected. Immediate specialist consultation and treatment required.',
         'digestive': 'Digestive system abnormalities detected. Specialist consultation recommended.',
         'spinal': 'Spinal abnormalities detected. Immediate specialist consultation recommended.',
-        'liver': 'Liver function abnormalities detected. Specialist consultation and further evaluation required.'
+        'liver': 'Liver function abnormalities detected. Specialist consultation and further evaluation required.',
       }
       return recommendations[diseaseLower] || 'Abnormalities detected. Specialist consultation recommended.'
     }
@@ -103,6 +104,23 @@ function DiagnosisResults() {
         pred === 'normal'
           ? 'No signs of digestive abnormality detected. Continue regular monitoring and follow-up as needed.'
           : 'Digestive abnormality detected. Specialist consultation recommended.'
+
+      return {
+        diagnosis: diagnosisLabel,
+        confidence: confPercent,
+        recommendation,
+        probabilities: aiResult.probabilities,
+      }
+    }
+    if (disease === 'health-check' && aiResult) {
+      const pred = (aiResult.prediction || '').toLowerCase()
+      const conf = aiResult.confidence ?? 0
+      const confPercent = typeof conf === 'number' && conf <= 1 ? conf * 100 : conf
+      const isHealthy = pred === 'normal' || pred.includes('normal')
+      const diagnosisLabel = isHealthy ? 'Healthy' : 'Not healthy'
+      const recommendation = isHealthy
+        ? 'Image appears healthy. Continue routine monitoring as needed.'
+        : 'Potential abnormality detected. Specialist consultation recommended.'
 
       return {
         diagnosis: diagnosisLabel,
@@ -361,7 +379,7 @@ function DiagnosisResults() {
         recommendedTests: recommendedTests.filter((test) => test.trim() !== ''),
         clinicalNotes,
         imageFile,
-        patientId: patient?.id,
+        patientId: patient?._id || patient?.id,
       }
 
       const resultAction = await dispatch(createDiagnosisThunk(payload))
