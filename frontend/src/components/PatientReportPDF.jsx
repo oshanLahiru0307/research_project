@@ -1,13 +1,13 @@
 import { forwardRef } from 'react'
 
-const PatientReportPDF = forwardRef(function PatientReportPDF({ 
-  patientData, 
-  aiAssessment, 
-  image, 
-  prescribedMedicine, 
-  recommendedTests, 
+const PatientReportPDF = forwardRef(function PatientReportPDF({
+  patientData,
+  aiAssessment,
+  image,
+  prescribedMedicine,
+  recommendedTests,
   clinicalNotes,
-  disease 
+  disease
 }, ref) {
 
   // Normalize patient data - support both API shape (firstName, lastName) and legacy shape (name)
@@ -51,7 +51,7 @@ const PatientReportPDF = forwardRef(function PatientReportPDF({
   // Function to get disease-specific diagnosis name
   const getDiseaseDiagnosisName = (diseaseType) => {
     const diseaseLower = diseaseType?.toLowerCase() || ''
-    
+
     const diagnosisMap = {
       'dr': 'PDR',
       'amd': 'No AMD',
@@ -61,13 +61,13 @@ const PatientReportPDF = forwardRef(function PatientReportPDF({
       'spinal': 'Spinal',
       'liver': 'Liver'
     }
-    
+
     if (diagnosisMap[diseaseLower]) {
       return diagnosisMap[diseaseLower]
     } else if (diseaseType) {
       return diseaseType.charAt(0).toUpperCase() + diseaseType.slice(1).toLowerCase()
     }
-    
+
     return 'No Diagnosis'
   }
 
@@ -83,10 +83,10 @@ const PatientReportPDF = forwardRef(function PatientReportPDF({
   ]
 
   const currentDate = new Date()
-  const formattedDate = currentDate.toLocaleDateString('en-US', { 
-    month: 'numeric', 
-    day: 'numeric', 
-    year: 'numeric' 
+  const formattedDate = currentDate.toLocaleDateString('en-US', {
+    month: 'numeric',
+    day: 'numeric',
+    year: 'numeric'
   })
   const formattedDateTime = currentDate.toLocaleString('en-US', {
     month: 'numeric',
@@ -188,9 +188,9 @@ const PatientReportPDF = forwardRef(function PatientReportPDF({
             <div className="flex-1 flex justify-center items-center">
               {image && (
                 <div className="bg-white p-3 rounded-lg shadow-md">
-                  <img 
-                    src={image} 
-                    alt="Retinal Scan" 
+                  <img
+                    src={image}
+                    alt="Retinal Scan"
                     className="w-full max-w-md h-auto rounded-lg border-2 border-purple-200"
                   />
                 </div>
@@ -199,13 +199,12 @@ const PatientReportPDF = forwardRef(function PatientReportPDF({
             <div className="flex-1 space-y-4">
               <div className="bg-white p-4 rounded-lg shadow-sm border-l-4 border-purple-500">
                 <p className="text-sm text-gray-600 mb-2 font-semibold">Diagnosis:</p>
-                <p className={`text-2xl font-bold mb-2 ${
-                  aiAssessment?.diagnosis === 'No AMD' || 
-                  aiAssessment?.diagnosis === 'No RVO' || 
-                  aiAssessment?.diagnosis?.toLowerCase().includes('no') 
-                    ? 'text-green-600' 
-                    : 'text-red-600'
-                }`}>
+                <p className={`text-2xl font-bold mb-2 ${aiAssessment?.diagnosis === 'No AMD' ||
+                  aiAssessment?.diagnosis === 'No RVO' ||
+                  aiAssessment?.diagnosis?.toLowerCase().includes('no')
+                  ? 'text-green-600'
+                  : 'text-red-600'
+                  }`}>
                   {aiAssessment?.diagnosis || (disease?.toLowerCase() === 'amd' ? 'No AMD' : 'No Diagnosis')}
                 </p>
               </div>
@@ -213,7 +212,7 @@ const PatientReportPDF = forwardRef(function PatientReportPDF({
                 <p className="text-sm text-gray-600 mb-1"><strong>Assessment Date:</strong> <span className="text-gray-800">{formattedDate}</span></p>
                 {aiAssessment?.confidence && (
                   <p className="text-sm text-gray-600 mt-2">
-                    <strong>Confidence Level:</strong> 
+                    <strong>Confidence Level:</strong>
                     <span className="ml-2 px-2 py-1 bg-indigo-100 text-indigo-700 rounded font-semibold">
                       {aiAssessment.confidence}%
                     </span>
@@ -286,6 +285,12 @@ const PatientReportPDF = forwardRef(function PatientReportPDF({
                 <p className="text-sm text-gray-800 bg-gray-50 p-3 rounded">{clinicalNotes}</p>
               </div>
             )}
+            {aiAssessment?.validation_report && (
+              <div className="mt-4 pt-4 border-t border-gray-200">
+                <p className="text-sm font-semibold text-indigo-700 mb-2">Doctor Referral Validation:</p>
+                <p className="text-sm text-gray-800 bg-indigo-50 p-3 rounded whitespace-pre-wrap">{aiAssessment.validation_report}</p>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -315,11 +320,10 @@ const PatientReportPDF = forwardRef(function PatientReportPDF({
                   <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-teal-50'}>
                     <td className="border border-teal-200 px-4 py-3 text-sm text-gray-800 font-medium">{history.date}</td>
                     <td className="border border-teal-200 px-4 py-3 text-sm text-gray-800">
-                      <span className={`px-2 py-1 rounded ${
-                        history.diagnosis.toLowerCase().includes('no') 
-                          ? 'bg-green-100 text-green-700' 
-                          : 'bg-red-100 text-red-700'
-                      } font-semibold`}>
+                      <span className={`px-2 py-1 rounded ${history.diagnosis.toLowerCase().includes('no')
+                        ? 'bg-green-100 text-green-700'
+                        : 'bg-red-100 text-red-700'
+                        } font-semibold`}>
                         {history.diagnosis}
                       </span>
                     </td>

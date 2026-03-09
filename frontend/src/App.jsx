@@ -7,7 +7,6 @@ import Layout from './components/Layout'
 import Dashboard from './pages/Dashboard'
 import Diagnosis from './pages/Diagnosis'
 import Patient from './pages/Patient'
-import PatientDetails from './pages/PatientDetails'
 
 function AppRoutes() {
   const { isAuthenticated } = useAuth()
@@ -34,7 +33,6 @@ function AppRoutes() {
                 <Route path="/diagnosis/*" element={<Diagnosis />} />
                 <Route path="/diagnose/*" element={<Diagnosis />} />
                 <Route path="/patient" element={<Patient />} />
-                <Route path="/patient/:id" element={<PatientDetails />} />
                 <Route path="/" element={<Navigate to="/dashboard" replace />} />
               </Routes>
             </Layout>
