@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchPatientsThunk } from '../../state/patientsSlice'
@@ -19,14 +19,11 @@ const diseaseConfig = {
     accent: 'from-emerald-500/10 to-teal-500/5',
     badge: 'bg-emerald-100 text-emerald-800 border-emerald-200',
   },
-<<<<<<< HEAD
   'health-check': {
     name: 'Health Check',
     accent: 'from-green-500/10 to-emerald-500/5',
     badge: 'bg-green-100 text-green-800 border-green-200',
   },
-=======
->>>>>>> f5b0f955c37f01e3e1e99a616408332d157a8f64
 }
 
 const statusStyles = {
@@ -52,6 +49,9 @@ function PatientsListForDiagnosis() {
   const { disease } = useParams()
   const dispatch = useDispatch()
   const { items: patients, status, error } = useSelector((state) => state.patients)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [conditionFilter, setConditionFilter] = useState('All')
+  const [statusFilter, setStatusFilter] = useState('All')
 
   useEffect(() => {
     if (status === 'idle') {
@@ -65,6 +65,21 @@ function PatientsListForDiagnosis() {
     accent: 'from-indigo-500/10 to-purple-500/5',
     badge: 'bg-indigo-100 text-indigo-800 border-indigo-200',
   }
+
+  const filteredPatients = patients.filter((p) => {
+    const name = `${p?.firstName || ''} ${p?.lastName || ''}`.trim()
+    const q = searchQuery.trim().toLowerCase()
+    const matchesQuery =
+      !q ||
+      name.toLowerCase().includes(q) ||
+      (p?.email || '').toLowerCase().includes(q) ||
+      (p?.phone || '').toLowerCase().includes(q)
+
+    const matchesCondition = conditionFilter === 'All' || (p?.condition || '') === conditionFilter
+    const matchesStatus = statusFilter === 'All' || (p?.status || '') === statusFilter
+
+    return matchesQuery && matchesCondition && matchesStatus
+  })
 
   const handleDiagnose = (patient) => {
     navigate(`/diagnose/${disease}/upload`, { state: { patient } })
@@ -102,6 +117,44 @@ function PatientsListForDiagnosis() {
             {error}
           </div>
         )}
+
+        {/* Search & Filters */}
+        <div className="px-6 pt-4 pb-2 border-b border-gray-100">
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <div className="flex-1">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search patients by name, email, or phone..."
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 outline-none"
+              />
+            </div>
+            <div className="flex gap-3">
+              <select
+                value={conditionFilter}
+                onChange={(e) => setConditionFilter(e.target.value)}
+                className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 outline-none"
+              >
+                <option value="All">All Conditions</option>
+                <option value="Digestive">Digestive</option>
+                <option value="Spinal">Spinal</option>
+                <option value="Liver">Liver</option>
+              </select>
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 outline-none"
+              >
+                <option value="All">All Status</option>
+                <option value="Active">Active</option>
+                <option value="Monitoring">Monitoring</option>
+                <option value="Scheduled">Scheduled</option>
+                <option value="Critical">Critical</option>
+              </select>
+            </div>
+          </div>
+        </div>
 
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
@@ -154,7 +207,7 @@ function PatientsListForDiagnosis() {
                   </td>
                 </tr>
               )}
-              {patients.map((patient, idx) => {
+              {filteredPatients.map((patient, idx) => {
                 const fullName =
                   [patient.firstName, patient.lastName].filter(Boolean).join(' ') || '—'
                 const initials = getInitials(patient)
