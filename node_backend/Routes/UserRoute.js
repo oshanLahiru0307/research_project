@@ -9,19 +9,21 @@ const {
     deleteUser
 } = require('../Controllers/UserControler');
 
-// Create a new user
-router.post('/users', createUser);
+const { auth, requireRole } = require('../Middleware/auth');
 
-// Get all users
-router.get('/users', getAllUsers);
+// Create a new user (admin only)
+router.post('/users', auth, requireRole('admin'), createUser);
 
-// Get a user by ID
-router.get('/users/:id', getUserById);
+// Get all users (admin only)
+router.get('/users', auth, requireRole('admin'), getAllUsers);
 
-// Update a user by ID
-router.put('/users/:id', updateUser);
+// Get a user by ID (admin or the user themself)
+router.get('/users/:id', auth, getUserById);
 
-// Delete a user by ID
-router.delete('/users/:id', deleteUser);
+// Update a user by ID (admin only for now)
+router.put('/users/:id', auth, requireRole('admin'), updateUser);
+
+// Delete a user by ID (admin only)
+router.delete('/users/:id', auth, requireRole('admin'), deleteUser);
 
 module.exports = router;

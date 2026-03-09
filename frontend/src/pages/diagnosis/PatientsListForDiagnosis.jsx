@@ -19,6 +19,11 @@ const diseaseConfig = {
     accent: 'from-emerald-500/10 to-teal-500/5',
     badge: 'bg-emerald-100 text-emerald-800 border-emerald-200',
   },
+  'health-check': {
+    name: 'Health Check',
+    accent: 'from-green-500/10 to-emerald-500/5',
+    badge: 'bg-green-100 text-green-800 border-green-200',
+  },
 }
 
 const statusStyles = {
