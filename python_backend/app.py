@@ -25,11 +25,6 @@ CORS(app)
 app.config["MAX_CONTENT_LENGTH"] = digestive_config.MAX_CONTENT_LENGTH
 
 
-@app.route("/digestive/health", methods=["GET"])
-def health():
-    """Health check endpoint."""
-    return jsonify({"status": "ok", "message": "API is running"})
-
 
 @app.route("/digestive/predict", methods=["POST"])
 def predict_endpoint():

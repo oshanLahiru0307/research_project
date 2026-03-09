@@ -1,8 +1,8 @@
 {
   "name": "node_backend",
   "version": "1.0.0",
-  "description": "This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.",
-  "main": "index.js",
+  "description": "",
+  "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon server.js"
@@ -11,7 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
- "@supabase/supabase-js": "^2.98.0",
+    "@supabase/supabase-js": "^2.98.0",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",

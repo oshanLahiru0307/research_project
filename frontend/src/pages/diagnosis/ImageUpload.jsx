@@ -18,6 +18,7 @@ function ImageUpload() {
     digestive: 'Digestive',
     spinal: 'Spinal',
     liver: 'Liver',
+    'health-check': 'Health Check',
   }
 
   const diseaseName = diseaseNames[disease] || 'Medical Condition'
@@ -66,7 +67,7 @@ function ImageUpload() {
     setIsAnalyzing(true)
 
     try {
-      if (disease === 'digestive') {
+      if (disease === 'digestive' || disease === 'health-check') {
         const apiResult = await predictDigestive(selectedFile)
         navigate(`/diagnose/${disease}/upload/results`, {
           state: {
